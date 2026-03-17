@@ -790,7 +790,7 @@ module.exports = {
 
 ## 📞 联系方式
 
-**项目负责人：** AutoX Task Manager Team
+**项目负责人：** AutoClaw Team
 **技术支持：** GitHub Issues
 **文档地址：** /docs
 

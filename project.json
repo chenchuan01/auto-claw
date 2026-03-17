@@ -1,11 +1,11 @@
 {
-  "name": "AutoX Task Manager",
-  "packageName": "com.autox.taskmanager",
+  "name": "AutoClaw",
+  "packageName": "com.autoclaw.app",
   "versionName": "1.0.0",
   "versionCode": 1,
   "icon": "@mipmap/ic_launcher",
-  "description": "基于AutoX.js开发的任务管理工具",
-  "author": "AutoX Task Manager Team",
+  "description": "基于AutoX.js开发的智能自动化工具",
+  "author": "AutoClaw Team",
   "main": "main.js",
   "permissions": [
     "android.permission.INTERNET",

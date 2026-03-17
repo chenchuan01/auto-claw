@@ -5,13 +5,13 @@
 
 module.exports = {
     // 应用信息
-    appName: 'AutoX任务管理器',
+    appName: 'AutoClaw',
     version: '1.0.0',
-    author: 'AutoX Task Manager Team',
-    
+    author: 'AutoClaw Team',
+
     // 存储配置
-    storageName: 'task_manager_data',
-    backupDir: '/sdcard/AutoXTaskManager/backups/',
+    storageName: 'autoclaw_data',
+    backupDir: '/sdcard/AutoClaw/backups/',
     
     // 颜色配置
     colors: {
@@ -51,7 +51,7 @@ console.log("任务执行结束");`,
     
     // 市场API配置
     marketApi: {
-        baseUrl: 'https://api.autox-taskmanager.com',
+        baseUrl: 'https://api.autoclaw.com',
         timeout: 10000,
         retryCount: 3
     },

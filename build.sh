@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# AutoX Task Manager 构建脚本
+# AutoClaw 构建脚本
 # 用于打包APK文件
 
 set -e
 
-echo "🚀 AutoX Task Manager 构建开始"
+echo "🚀 AutoClaw 构建开始"
 
 # 检查必要工具
 check_tool() {
@@ -59,7 +59,7 @@ echo "📄 创建AndroidManifest.xml..."
 cat > build/AndroidManifest.xml << 'EOF'
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.autox.taskmanager">
+    package="com.autoclaw.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -72,7 +72,7 @@ cat > build/AndroidManifest.xml << 'EOF'
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="AutoX Task Manager"
+        android:label="AutoClaw"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:usesCleartextTraffic="true">
         
@@ -93,7 +93,7 @@ cat > build/AndroidManifest.xml << 'EOF'
             
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.autox.taskmanager.fileprovider"
+            android:authorities="com.autoclaw.app.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -113,7 +113,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 33
     defaultConfig {
-        applicationId "com.autox.taskmanager"
+        applicationId "com.autoclaw.app"
         minSdkVersion 21
         targetSdkVersion 33
         versionCode 1
@@ -184,26 +184,26 @@ chmod +x build/package.sh
 # 创建分发包
 echo "📦 创建分发包..."
 cd build
-zip -r ../AutoXTaskManager_Source.zip .
+zip -r ../AutoClaw_Source.zip .
 cd ..
 
 # 创建简易安装包（用于AutoX.js）
 echo "📱 创建AutoX.js安装包..."
-mkdir -p dist/AutoXTaskManager
-cp -r *.js ui/ core/ data/ project.json README.md INSTALL.md dist/AutoXTaskManager/
+mkdir -p dist/AutoClaw
+cp -r *.js ui/ core/ data/ project.json README.md INSTALL.md dist/AutoClaw/
 cd dist
-zip -r ../AutoXTaskManager_AutoX.zip AutoXTaskManager
+zip -r ../AutoClaw_AutoX.zip AutoClaw
 cd ..
 
 echo ""
 echo "✅ 构建完成!"
 echo ""
 echo "📁 生成的文件:"
-echo "  - AutoXTaskManager_Source.zip - 完整源代码包"
-echo "  - AutoXTaskManager_AutoX.zip - AutoX.js安装包"
+echo "  - AutoClaw_Source.zip - 完整源代码包"
+echo "  - AutoClaw_AutoX.zip - AutoX.js安装包"
 echo ""
 echo "🚀 下一步:"
-echo "  1. 将AutoXTaskManager_AutoX.zip导入AutoX.js直接运行"
+echo "  1. 将AutoClaw_AutoX.zip导入AutoX.js直接运行"
 echo "  2. 或使用build目录中的package.sh打包APK"
 echo ""
 echo "📱 安装方式详见: INSTALL.md"

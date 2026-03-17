@@ -1,4 +1,4 @@
-# AutoX Task Manager 安装指南
+# AutoClaw 安装指南
 
 ## 方式一：通过AutoX.js直接运行
 
@@ -9,9 +9,9 @@
    - 开启无障碍服务
 
 2. 导入项目文件
-   - 将整个`AutoXTaskManager`文件夹复制到手机
+   - 将整个`AutoClaw`文件夹复制到手机
    - 在AutoX.js中点击"导入"
-   - 选择`AutoXTaskManager`文件夹
+   - 选择`AutoClaw`文件夹
 
 3. 运行应用
    - 在AutoX.js中找到`main.js`
@@ -31,13 +31,13 @@
 npm install -g autox-cli
 
 # 2. 进入项目目录
-cd AutoXTaskManager
+cd AutoClaw
 
 # 3. 构建APK
-autox build --platform android --output taskmanager.apk
+autox build --platform android --output autoclaw.apk
 
 # 4. 安装到设备
-adb install taskmanager.apk
+adb install autoclaw.apk
 ```
 
 ## 方式三：使用预编译APK（推荐）
@@ -47,7 +47,7 @@ adb install taskmanager.apk
 - 官方市场: [待上架]
 
 ### 安装步骤
-1. 下载`AutoXTaskManager.apk`
+1. 下载`AutoClaw.apk`
 2. 在Android设备上安装
 3. 授予必要权限
 4. 开启无障碍服务
@@ -120,7 +120,7 @@ adb install taskmanager.apk
 - 官方文档: [待完善]
 - GitHub Issues: [待创建]
 - 社区论坛: [待建立]
-- 邮箱支持: support@autox-taskmanager.com
+- 邮箱支持: support@autoclaw.com
 
 ## 免责声明
 
