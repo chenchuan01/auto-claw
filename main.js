@@ -7,11 +7,13 @@
 
 // 显示启动界面
 ui.layout(
-    '<vertical gravity="center" padding="32">' +
-    '  <text text="🚀" textSize="48sp" textColor="#2196F3"/>' +
-    '  <text text="AutoClaw" textSize="24sp" textColor="#212121" marginTop="16"/>' +
-    '  <text text="正在启动..." textSize="14sp" textColor="#757575" marginTop="8"/>' +
-    '  <progressbar indeterminate="true" marginTop="32"/>' +
+    '<vertical gravity="center" w="*" h="*" bg="#FFFFFF">' +
+    '  <vertical gravity="center">' +
+    '    <text text="🚀" textSize="56sp" gravity="center"/>' +
+    '    <text text="AutoClaw" textSize="26sp" textColor="#1A1A2E" textStyle="bold" gravity="center" marginTop="16"/>' +
+    '    <text text="自动化任务管理" textSize="13sp" textColor="#9CA3AF" gravity="center" marginTop="6"/>' +
+    '    <progressbar indeterminate="true" style="Widget.AppCompat.ProgressBar.Horizontal" indeterminateTint="#1F6FEB" w="160" h="4" marginTop="40" cornerRadius="2"/>' +
+    '  </vertical>' +
     '</vertical>'
 );
 
@@ -23,7 +25,7 @@ setTimeout(function() {
         var DataManager = require('./modules/data_manager');
         var TaskExecutor = require('./modules/task_executor');
         var MarketService = require('./modules/market_service');
-        var UIManager = require('./modules/ui_manager_complete');
+        var UIManager = require('./modules/ui_manager');
 
         // 初始化管理器
         var dataManager = new DataManager();

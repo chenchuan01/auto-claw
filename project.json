@@ -9,6 +9,14 @@
     {
       "form": "/storage/emulated/0/Scripts/AutoClaw",
       "to": "/project"
+    },
+    {
+      "form": "file:///android_asset/models",
+      "to": "/models"
+    },
+    {
+      "form": "file:///android_asset/mlkit-google-ocr-models",
+      "to": "/mlkit-google-ocr-models"
     }
   ],
   "buildDir": "build",
@@ -37,7 +45,18 @@
     "libjackpal-androidterm5.so",
     "libjackpal-termexec2.so",
     "libopencv_java4.so",
-    "libp7zip.so"
+    "libp7zip.so",
+    "libc++_shared.so",
+    "libpaddle_light_api_shared.so",
+    "libhiai.so",
+    "libhiai_ir.so",
+    "libhiai_ir_build.so",
+    "libNative.so",
+    "libmlkit_google_ocr_pipeline.so",
+    "libtesseract.so",
+    "libpng.so",
+    "libleptonica.so",
+    "libjpeg.so"
   ],
   "main": "main.js",
   "name": "AutoClaw",

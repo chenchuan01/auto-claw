@@ -28,49 +28,47 @@ TaskExecutor.prototype.executeTask = function(taskId) {
     this.addTaskLog(taskId, '🚀 开始执行任务: ' + task.name);
     this.addTaskLog(taskId, '📅 开始时间: ' + new Date().toLocaleString());
 
-    // 在主线程中执行脚本，避免线程间通信问题
-    try {
-        this.addTaskLog(taskId, '📝 开始执行脚本...');
-
+    var script = task.script;
+    var thread = threads.start(function() {
         var originalLog = console.log;
-        var logTaskId = taskId;
-        var logSelf = self;
-        console.log = function() {
-            var args = Array.prototype.slice.call(arguments);
-            var msg = args.map(function(a) {
-                return typeof a === 'object' ? JSON.stringify(a) : String(a);
-            }).join(' ');
-            logSelf.addTaskLog(logTaskId, msg);
-            // 直接调用原始 log 函数，避免 apply 兼容性问题
-            if (args.length === 0) {
-                originalLog();
-            } else if (args.length === 1) {
-                originalLog(args[0]);
-            } else if (args.length === 2) {
-                originalLog(args[0], args[1]);
-            } else if (args.length === 3) {
-                originalLog(args[0], args[1], args[2]);
-            } else {
-                originalLog(args.join(' '));
-            }
-        };
+        try {
+            self.addTaskLog(taskId, '📝 开始执行脚本...');
 
-        eval(task.script);
-        console.log = originalLog;
+            console.log = function() {
+                var args = Array.prototype.slice.call(arguments);
+                var msg = args.map(function(a) {
+                    return typeof a === 'object' ? JSON.stringify(a) : String(a);
+                }).join(' ');
+                self.addTaskLog(taskId, msg);
+                if (args.length === 1) {
+                    originalLog(args[0]);
+                } else if (args.length === 2) {
+                    originalLog(args[0], args[1]);
+                } else if (args.length === 3) {
+                    originalLog(args[0], args[1], args[2]);
+                } else if (args.length > 3) {
+                    originalLog(args.join(' '));
+                }
+            };
 
-        this.addTaskLog(taskId, '✅ 任务执行成功');
-        this.dataManager.updateTask(taskId, { status: 'success' });
-        toast('任务执行成功');
-    } catch (e) {
-        this.addTaskLog(taskId, '❌ 任务执行失败: ' + e.message);
-        this.addTaskLog(taskId, '🔍 错误堆栈: ' + e.stack);
-        this.dataManager.updateTask(taskId, { status: 'failed' });
-        toast('任务执行失败: ' + e.message);
-    } finally {
-        delete this.runningTasks[taskId];
-        this.addTaskLog(taskId, '🏁 任务执行结束: ' + new Date().toLocaleString());
-    }
+            eval(script);
 
+            self.addTaskLog(taskId, '✅ 任务执行成功');
+            self.dataManager.updateTask(taskId, { status: 'success' });
+            toast('任务执行成功');
+        } catch (e) {
+            self.addTaskLog(taskId, '❌ 任务执行失败: ' + e.message);
+            self.addTaskLog(taskId, '🔍 错误堆栈: ' + e.stack);
+            self.dataManager.updateTask(taskId, { status: 'failed' });
+            toast('任务执行失败: ' + e.message);
+        } finally {
+            console.log = originalLog;
+            delete self.runningTasks[taskId];
+            self.addTaskLog(taskId, '🏁 任务执行结束: ' + new Date().toLocaleString());
+        }
+    });
+
+    this.runningTasks[taskId] = thread;
     toast('任务开始执行...');
     return true;
 };

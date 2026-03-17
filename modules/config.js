@@ -13,34 +13,34 @@ module.exports = {
     storageName: 'autoclaw_data',
     backupDir: '/sdcard/AutoClaw/backups/',
     
-    // 颜色配置（深色主题）
+    // 颜色配置（白色主题 + 小米卡布里蓝）
     colors: {
-        primary:       '#7C5CBF',
-        primaryDark:   '#5A3F9A',
-        accent:        '#5B8DEF',
+        primary:       '#1F6FEB',
+        primaryDark:   '#1558C0',
+        accent:        '#1F6FEB',
         success:       '#22C55E',
         warning:       '#F59E0B',
         error:         '#EF4444',
-        info:          '#5B8DEF',
-        bg:            '#0F0F1E',
-        card:          '#1A1A2E',
-        surface:       '#252540',
-        divider:       '#2A2A42',
-        textPrimary:   '#FFFFFF',
-        textSecondary: '#8B8BA8',
-        textHint:      '#5A5A78',
+        info:          '#1F6FEB',
+        bg:            '#FFFFFF',
+        card:          '#F5F7FA',
+        surface:       '#EEF1F6',
+        divider:       '#E2E6ED',
+        textPrimary:   '#1A1A2E',
+        textSecondary: '#6B7280',
+        textHint:      '#9CA3AF',
         // 兼容旧引用
-        background:    '#0F0F1E',
-        cardBackground:'#1A1A2E'
+        background:    '#FFFFFF',
+        cardBackground:'#F5F7FA'
     },
 
     // 状态映射
     statusMap: {
-        idle:    { text: '待执行', color: '#F59E0B' },
-        running: { text: '执行中', color: '#5B8DEF' },
-        success: { text: '已完成', color: '#22C55E' },
-        failed:  { text: '失败',   color: '#EF4444' },
-        paused:  { text: '已暂停', color: '#8B8BA8' }
+        idle:    { text: '待执行', color: '#FFA726', dot: '●' },
+        running: { text: '执行中', color: '#FFA726', dot: '●' },
+        success: { text: '已完成', color: '#66BB6A', dot: '●' },
+        failed:  { text: '失败',   color: '#EF5350', dot: '●' },
+        paused:  { text: '已暂停', color: '#FFA726', dot: '●' }
     },
     
     // 默认任务脚本
