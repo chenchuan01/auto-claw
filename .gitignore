@@ -1,0 +1,69 @@
+# AutoX.js 项目忽略文件
+
+# 日志文件
+*.log
+logs/
+
+# 备份文件
+backups/
+*.backup
+*.bak
+
+# 临时文件
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# 编辑器和 IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node.js (如果使用)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 构建输出
+build/
+dist/
+*.apk
+*.aab
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 用户数据
+data/
+user_data/
+*.db
+*.sqlite
+
+# 缓存
+.cache/
+*.cache
+
+# 系统文件
+Thumbs.db
+Desktop.ini
+
+# AutoX.js 特定
+.autoxjs/
+.project/
+
+# 敏感信息
+secrets/
+credentials/
+*.key
+*.pem

@@ -1,0 +1,36 @@
+{
+  "name": "AutoX Task Manager",
+  "packageName": "com.autox.taskmanager",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "icon": "@mipmap/ic_launcher",
+  "description": "基于AutoX.js开发的任务管理工具",
+  "author": "AutoX Task Manager Team",
+  "main": "main.js",
+  "permissions": [
+    "android.permission.INTERNET",
+    "android.permission.ACCESS_NETWORK_STATE",
+    "android.permission.WRITE_EXTERNAL_STORAGE",
+    "android.permission.READ_EXTERNAL_STORAGE",
+    "android.permission.SYSTEM_ALERT_WINDOW",
+    "android.permission.ACCESS_NOTIFICATION_POLICY"
+  ],
+  "features": [
+    "任务管理",
+    "任务市场",
+    "脚本执行",
+    "定时任务",
+    "数据备份"
+  ],
+  "screenshots": [
+    "screenshots/main.png",
+    "screenshots/market.png",
+    "screenshots/editor.png"
+  ],
+  "dependencies": [],
+  "build": {
+    "minSdkVersion": 21,
+    "targetSdkVersion": 33,
+    "compileSdkVersion": 33
+  }
+}
