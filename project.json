@@ -1,36 +1,55 @@
 {
-  "name": "AutoClaw",
-  "packageName": "com.autoclaw.app",
-  "versionName": "1.0.0",
-  "versionCode": 1,
-  "icon": "@mipmap/ic_launcher",
-  "description": "基于AutoX.js开发的智能自动化工具",
-  "author": "AutoClaw Team",
-  "main": "main.js",
-  "permissions": [
-    "android.permission.INTERNET",
-    "android.permission.ACCESS_NETWORK_STATE",
-    "android.permission.WRITE_EXTERNAL_STORAGE",
-    "android.permission.READ_EXTERNAL_STORAGE",
-    "android.permission.SYSTEM_ALERT_WINDOW",
-    "android.permission.ACCESS_NOTIFICATION_POLICY"
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
   ],
-  "features": [
-    "任务管理",
-    "任务市场",
-    "脚本执行",
-    "定时任务",
-    "数据备份"
+  "assets": [
+    {
+      "form": "/storage/emulated/0/Scripts/AutoClaw",
+      "to": "/project"
+    }
   ],
-  "screenshots": [
-    "screenshots/main.png",
-    "screenshots/market.png",
-    "screenshots/editor.png"
-  ],
-  "dependencies": [],
+  "buildDir": "build",
   "build": {
-    "minSdkVersion": 21,
-    "targetSdkVersion": 33,
-    "compileSdkVersion": 33
-  }
+    "build_id": null,
+    "build_number": 0,
+    "build_time": 0
+  },
+  "useFeatures": [],
+  "icon": "res/logo.png",
+  "ignoredDirs": [
+    "build"
+  ],
+  "launchConfig": {
+    "displaySplash": false,
+    "hideLauncher": false,
+    "hideLogs": false,
+    "stableMode": true,
+    "volumeUpcontrol": false,
+    "permissions": [],
+    "serviceDesc": "使脚本自动操作(点击、长按、滑动等)所需",
+    "splashIcon": "res/splashIcon.png",
+    "splashText": "Powered by yyfun"
+  },
+  "libs": [
+    "libjackpal-androidterm5.so",
+    "libjackpal-termexec2.so",
+    "libopencv_java4.so",
+    "libp7zip.so"
+  ],
+  "main": "main.js",
+  "name": "AutoClaw",
+  "outputPath": "/storage/emulated/0/Scripts/AutoClaw/build",
+  "packageName": "com.autoclaw.app",
+  "projectDirectory": "/storage/emulated/0/Scripts/AutoClaw",
+  "scripts": {},
+  "signingConfig": {
+    "alias": "cqyy",
+    "keystore": "/storage/emulated/0/Scripts/.keyStore/cqyy.keystore"
+  },
+  "sourcePath": "/storage/emulated/0/Scripts/AutoClaw/main.js",
+  "versionCode": 1,
+  "versionName": "1.0.0"
 }

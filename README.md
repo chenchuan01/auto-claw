@@ -127,6 +127,16 @@ AutoClaw/
 | 网络请求 | AutoX.js http |
 | 多线程 | AutoX.js threads |
 | 定时任务 | AutoX.js timers |
+| JavaScript 引擎 | Rhino (ES5 兼容) |
+
+## ⚠️ 重要说明
+
+本项目使用 **ES5 语法**编写，以兼容 AutoX.js 的 Rhino JavaScript 引擎。
+
+**开发者请注意：**
+- 不支持 ES6+ 特性（class、async/await、箭头函数等）
+- 详细兼容性说明请查看 [兼容性开发指南](docs/COMPATIBILITY.md)
+- 安装说明请查看 [安装指南](INSTALL.md)
 
 ## 📦 模块说明
 

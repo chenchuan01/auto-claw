@@ -81,6 +81,53 @@ adb install autoclaw.apk
    - 浏览任务市场
    - 创建定时任务
 
+## JavaScript 引擎兼容性说明
+
+AutoX.js 使用 **Rhino JS 引擎**，部分 ES6+ 语法不受支持。本项目代码已针对此做兼容处理：
+
+| 语法特性 | 支持情况 | 处理方式 |
+|---|---|---|
+| `class` 关键字 | ❌ 不支持 | 改为 ES5 构造函数 + `prototype` |
+| `async / await` | ❌ 不支持 | 改为同步调用 |
+| `new Map()` | ❌ 不支持 | 改为普通对象 `{}` |
+| `for...of` | ❌ 不支持 | 改为 `for` 循环 |
+| `forEach()` | ✅ 支持 | 但建议用 `for` 循环以保持一致性 |
+| `const / let` | ⚠️ 部分支持 | **建议全部改为 `var`** |
+| 箭头函数 `() => {}` | ⚠️ 部分支持 | **建议全部改为 `function() {}`** |
+| 模板字符串（普通） | ✅ 支持 | 可以使用 `` `文本` `` |
+| 模板字符串（XML中） | ❌ 不支持 | **XML 布局必须用字符串拼接** |
+| 模板字符串插值 | ⚠️ 有风险 | **避免在 XML 中使用 `${}`** |
+| 展开运算符 `...` | ✅ 支持 | 保持不变 |
+
+### 重要兼容性规则
+
+1. **所有文件统一使用 ES5 语法**
+   - 使用 `var` 而不是 `const/let`
+   - 使用 `function() {}` 而不是箭头函数
+   - 使用传统 `for` 循环而不是 `for...of`
+
+2. **XML 布局字符串处理**
+   ```javascript
+   // ❌ 错误：模板字符串在 XML 中可能导致解析错误
+   ui.layout(`<text text="${message}"/>`);
+
+   // ✅ 正确：使用字符串拼接
+   ui.layout('<text id="msg"/>');
+   ui.msg.setText(message);
+
+   // ✅ 正确：静态文本可以用字符串拼接
+   ui.layout('<text text="' + message + '"/>');
+   ```
+
+3. **已转换的文件**
+   - `main.js` - 主入口文件（已转换）
+   - `modules/data_manager.js` - 数据管理模块（已转换）
+   - `modules/task_executor.js` - 任务执行器（已转换）
+   - `modules/market_service.js` - 市场服务（已转换）
+   - `modules/ui_manager_complete.js` - UI 管理器（已转换）
+
+> 如遇到 `identifier is a reserved word` 或 `SAXParseException` 报错，通常是使用了不兼容的 ES6+ 语法，参照上表进行转换。
+
 ## 常见问题
 
 ### Q1: 应用无法启动
