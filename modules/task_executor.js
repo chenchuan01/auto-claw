@@ -40,15 +40,7 @@ TaskExecutor.prototype.executeTask = function(taskId) {
                     return typeof a === 'object' ? JSON.stringify(a) : String(a);
                 }).join(' ');
                 self.addTaskLog(taskId, msg);
-                if (args.length === 1) {
-                    originalLog(args[0]);
-                } else if (args.length === 2) {
-                    originalLog(args[0], args[1]);
-                } else if (args.length === 3) {
-                    originalLog(args[0], args[1], args[2]);
-                } else if (args.length > 3) {
-                    originalLog(args.join(' '));
-                }
+                originalLog.apply(console, args);
             };
 
             eval(script);

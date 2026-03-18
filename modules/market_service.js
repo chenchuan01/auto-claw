@@ -93,7 +93,7 @@ MarketService.prototype._getMockMarketTasks = function(options) {
             ratingCount: 67,
             version: '1.0.0',
             updateTime: Date.now() - 4 * 24 * 60 * 60 * 1000,
-            script: 'var info = "设备信息:\\n";\ninfo += "屏幕宽度: " + device.width + "\\n";\ninfo += "屏幕高度: " + device.height + "\\n";\ninfo += "Android版本: " + device.release + "\\n";\ninfo += "SDK版本: " + device.sdkInt + "\\n";\ninfo += "电量: " + device.getBattery() + "%\\n";\nconsole.log(info);\ntoast("设备信息已输出到日志");',
+            script: 'var info = "设备信息:\\n";\ninfo += "屏幕宽度: " + device.width + "\\n";\ninfo += "屏幕高度: " + device.height + "\\n";\ninfo += "Android版本: " + device.release + "\\n";\ninfo += "SDK版本: " + device.sdkInt + "\\n";\ninfo += "电量: " + device.battery + "%\\n";\nconsole.log(info);\ntoast("设备信息已输出到日志");',
             tags: ['测试', '设备信息', '调试'],
             category: '测试工具',
             price: 0,

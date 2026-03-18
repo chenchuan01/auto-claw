@@ -11,10 +11,10 @@ function UIDialogs(uiManager) {
 UIDialogs.prototype.showAddTaskDialog = function() {
     var self = this;
     var mgr = this.uiManager;
-    dialogs.rawInput('新建任务', '请输入任务名称：', '', function(name) {
+    dialogs.rawInput('请输入任务名称', '', function(name) {
         if (!name || !name.trim()) return;
-        dialogs.rawInput('任务描述', '请输入任务描述（可选）：', '', function(description) {
-            dialogs.rawInput('任务脚本', '请输入任务脚本：', Config.defaultScript, function(script) {
+        dialogs.rawInput('请输入任务描述（可选）', '', function(description) {
+            dialogs.rawInput('请输入任务脚本', Config.defaultScript, function(script) {
                 mgr.dataManager.addTask({
                     name: name.trim(),
                     description: description ? description.trim() : '',
@@ -32,10 +32,10 @@ UIDialogs.prototype.showEditTask = function(taskId) {
     var mgr = this.uiManager;
     var task = mgr.dataManager.getTaskById(taskId);
     if (!task) return;
-    dialogs.rawInput('编辑任务名称', '请输入任务名称：', task.name, function(name) {
+    dialogs.rawInput('请输入任务名称', task.name, function(name) {
         if (!name || !name.trim()) return;
-        dialogs.rawInput('编辑任务描述', '请输入任务描述：', task.description || '', function(description) {
-            dialogs.rawInput('编辑任务脚本', '请输入任务脚本：', task.script || Config.defaultScript, function(script) {
+        dialogs.rawInput('请输入任务描述', task.description || '', function(description) {
+            dialogs.rawInput('请输入任务脚本', task.script || Config.defaultScript, function(script) {
                 mgr.dataManager.updateTask(taskId, {
                     name: name.trim(),
                     description: description.trim(),
