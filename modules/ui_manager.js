@@ -8,6 +8,7 @@ var UIMainView = require('./ui_main_view');
 var UITaskDetail = require('./ui_task_detail');
 var UIMarketView = require('./ui_market_view');
 var UIDialogs = require('./ui_dialogs');
+var UIScriptEditor = require('./ui_script_editor');
 
 function UIManager(dataManager, taskExecutor, marketService, recorder) {
     this.dataManager = dataManager;
@@ -23,6 +24,7 @@ function UIManager(dataManager, taskExecutor, marketService, recorder) {
     this.taskDetail = new UITaskDetail(this);
     this.marketView = new UIMarketView(this);
     this.dialogs = new UIDialogs(this);
+    this.scriptEditor = new UIScriptEditor(this);
 }
 
 UIManager.prototype.showMainView = function() {
@@ -61,6 +63,13 @@ UIManager.prototype.showMarketView = function() {
     this.currentView = 'market';
     this.stopAutoRefresh();
     this.marketView.show();
+};
+
+UIManager.prototype.showScriptEditor = function(taskId) {
+    this.currentView = 'script_editor';
+    this.currentTaskId = taskId;
+    this.stopAutoRefresh();
+    this.scriptEditor.show(taskId);
 };
 
 UIManager.prototype.executeTask = function(taskId) {

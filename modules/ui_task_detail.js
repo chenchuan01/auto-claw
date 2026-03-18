@@ -63,7 +63,7 @@ UITaskDetail.prototype.show = function(taskId) {
     );
 
     ui.btn_back.on('click', function() { mgr.showMainView(); });
-    ui.btn_edit.on('click', function() { mgr.dialogs.showEditTask(taskId); });
+    ui.btn_edit.on('click', function() { mgr.showScriptEditor(taskId); });
     ui.btn_run_now.on('click', function() { mgr.executeTask(taskId); });
     ui.btn_logs.on('click', function() { mgr.dialogs.showTaskLogs(taskId); });
     ui.btn_export.on('click', function() { mgr.exportTaskScript(taskId); });
