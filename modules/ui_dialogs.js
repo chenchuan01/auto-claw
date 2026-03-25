@@ -92,7 +92,7 @@ UIDialogs.prototype.showTaskLogs = function(taskId) {
     var hasError = false;
     var errorText = '';
     for (var i = 0; i < logs.length; i++) {
-        if (logs[i].indexOf('❌') !== -1 || logs[i].indexOf('错误') !== -1 || logs[i].indexOf('失败') !== -1) {
+        if (logs[i].indexOf('✕') !== -1 || logs[i].indexOf('错误') !== -1 || logs[i].indexOf('失败') !== -1) {
             hasError = true;
             errorText += logs[i] + '\n';
         }

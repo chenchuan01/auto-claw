@@ -25,55 +25,48 @@ TaskExecutor.prototype.executeTask = function(taskId) {
     });
 
     this.taskLogs[taskId] = [];
-    this.addTaskLog(taskId, '🚀 开始执行任务: ' + task.name);
-    this.addTaskLog(taskId, '📅 开始时间: ' + new Date().toLocaleString());
+    this.addTaskLog(taskId, '▶ 开始执行任务: ' + task.name);
+    this.addTaskLog(taskId, '⏱ 开始时间: ' + new Date().toLocaleString());
 
-    var script = task.script;
-    var thread = threads.start(function() {
-        var originalLog = console.log;
-        try {
-            self.addTaskLog(taskId, '📝 开始执行脚本...');
+    try {
+        var execution = engines.execScript(task.name, task.script);
+        var engine = execution.getEngine();
+        this.runningTasks[taskId] = engine;
 
-            console.log = function() {
-                var args = Array.prototype.slice.call(arguments);
-                var msg = args.map(function(a) {
-                    return typeof a === 'object' ? JSON.stringify(a) : String(a);
-                }).join(' ');
-                self.addTaskLog(taskId, msg);
-                originalLog.apply(console, args);
-            };
+        // 监控脚本完成
+        threads.start(function() {
+            execution.waitFor();
+            if (self.runningTasks[taskId] === engine) {
+                delete self.runningTasks[taskId];
+                var currentTask = self.dataManager.getTaskById(taskId);
+                if (currentTask && currentTask.status === 'running') {
+                    self.dataManager.updateTask(taskId, { status: 'success' });
+                    self.addTaskLog(taskId, '✓ 任务执行完成');
+                }
+                self.addTaskLog(taskId, '▪ 任务执行结束: ' + new Date().toLocaleString());
+            }
+        });
 
-            eval(script);
-
-            self.addTaskLog(taskId, '✅ 任务执行成功');
-            self.dataManager.updateTask(taskId, { status: 'success' });
-            toast('任务执行成功');
-        } catch (e) {
-            self.addTaskLog(taskId, '❌ 任务执行失败: ' + e.message);
-            self.addTaskLog(taskId, '🔍 错误堆栈: ' + e.stack);
-            self.dataManager.updateTask(taskId, { status: 'failed' });
-            toast('任务执行失败: ' + e.message);
-        } finally {
-            console.log = originalLog;
-            delete self.runningTasks[taskId];
-            self.addTaskLog(taskId, '🏁 任务执行结束: ' + new Date().toLocaleString());
-        }
-    });
-
-    this.runningTasks[taskId] = thread;
-    toast('任务开始执行...');
-    return true;
+        toast('任务开始执行...');
+        return true;
+    } catch (e) {
+        delete this.runningTasks[taskId];
+        this.addTaskLog(taskId, '✕ 启动任务失败: ' + e.message);
+        this.dataManager.updateTask(taskId, { status: 'failed' });
+        toast('启动任务失败: ' + e.message);
+        return false;
+    }
 };
 
 TaskExecutor.prototype.stopTask = function(taskId) {
-    var thread = this.runningTasks[taskId];
-    if (!thread) { toast('任务未在运行'); return false; }
+    var engine = this.runningTasks[taskId];
+    if (!engine) { toast('任务未在运行'); return false; }
 
     try {
-        thread.interrupt();
+        engine.forceStop();
         delete this.runningTasks[taskId];
         this.dataManager.updateTask(taskId, { status: 'paused' });
-        this.addTaskLog(taskId, '⏸️ 任务被手动停止');
+        this.addTaskLog(taskId, '‖ 任务被手动停止');
         toast('任务已停止');
         return true;
     } catch (e) {
@@ -113,9 +106,9 @@ TaskExecutor.prototype.stopAllTasks = function() {
     for (var taskId in this.runningTasks) {
         if (!this.runningTasks.hasOwnProperty(taskId)) continue;
         try {
-            this.runningTasks[taskId].interrupt();
+            this.runningTasks[taskId].forceStop();
             this.dataManager.updateTask(taskId, { status: 'paused' });
-            this.addTaskLog(taskId, '⏸️ 任务被批量停止');
+            this.addTaskLog(taskId, '‖ 任务被批量停止');
             stoppedCount++;
         } catch (e) {
             console.error('停止任务失败:', taskId, e);

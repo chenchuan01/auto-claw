@@ -84,6 +84,10 @@ UIManager.prototype.executeTask = function(taskId) {
     }
 };
 
+UIManager.prototype.stopTask = function(taskId) {
+    this.taskExecutor.stopTask(taskId);
+};
+
 UIManager.prototype.exportTaskScript = function(taskId) {
     var task = this.dataManager.getTaskById(taskId);
     if (!task) return;

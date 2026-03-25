@@ -16,50 +16,54 @@ UIMainView.prototype.show = function() {
 
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
-        '  <horizontal bg="' + C.primary + '" padding="16 14" gravity="center_vertical">' +
+        '  <!-- 标题栏 -->' +
+        '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
         '    <vertical layout_weight="1">' +
-        '      <text text="AutoClaw" textSize="22sp" textColor="#FFFFFF" textStyle="bold"/>' +
-        '      <text text="自动化任务管理" textSize="11sp" textColor="#FFFFFF" alpha="0.8" marginTop="2"/>' +
+        '      <text text="AutoClaw" textSize="26sp" textColor="#FFFFFF" textStyle="bold"/>' +
+        '      <text text="自动化任务管理" textSize="12sp" textColor="#B3D1FF" marginTop="2"/>' +
         '    </vertical>' +
-        '    <text id="btn_settings" text="⚙" textSize="22sp" textColor="#FFFFFF" padding="8"/>' +
+        '    <text id="btn_settings" text="⚙" textSize="24sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
         '  </horizontal>' +
+        '  <!-- 任务列表区域 -->' +
         '  <frame layout_weight="1">' +
         '    <list id="task_list" bg="' + C.bg + '">' +
-        '      <vertical margin="12 6 12 6" bg="' + C.card + '" cornerRadius="14" padding="16" w="*">' +
+        '      <vertical margin="12 16 12 16" bg="' + C.card + '" cornerRadius="18" padding="18" w="*">' +
         '        <horizontal gravity="center_vertical">' +
-        '          <text id="status_dot" text="{{this.statusDot}}" textSize="16sp" textColor="{{this.statusColor}}" marginRight="8"/>' +
+        '          <text id="status_dot" text="{{this.statusDot}}" textSize="18sp" textColor="{{this.statusColor}}" marginRight="10"/>' +
         '          <vertical layout_weight="1">' +
-        '            <text id="task_name" text="{{this.name}}" textSize="16sp" textColor="' + C.textPrimary + '" textStyle="bold"/>' +
-        '            <text id="task_desc" text="{{this.description}}" textSize="12sp" textColor="' + C.textSecondary + '" maxLines="1" marginTop="3"/>' +
+        '            <text id="task_name" text="{{this.name}}" textSize="17sp" textColor="' + C.textPrimary + '" textStyle="bold"/>' +
+        '            <text id="task_desc" text="{{this.description}}" textSize="13sp" textColor="' + C.textSecondary + '" maxLines="1" marginTop="4"/>' +
         '          </vertical>' +
         '        </horizontal>' +
-        '        <horizontal marginTop="10" gravity="center_vertical">' +
-        '          <text id="task_time" text="{{this.lastRunTimeText}}" textSize="11sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
-        '          <text id="task_count" text="执行 {{this.runCount}} 次" textSize="11sp" textColor="' + C.textHint + '"/>' +
+        '        <horizontal marginTop="14" gravity="center_vertical">' +
+        '          <text id="task_time" text="{{this.lastRunTimeText}}" textSize="12sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
+        '          <text id="task_count" text="执行 {{this.runCount}} 次" textSize="12sp" textColor="' + C.textHint + '"/>' +
         '        </horizontal>' +
-        '        <horizontal marginTop="12">' +
-        '          <button id="btn_run" text="▶ 执行" layout_weight="1" marginRight="6" bg="' + C.primary + '" textColor="white" textSize="13sp" cornerRadius="8" h="36"/>' +
-        '          <button id="btn_manage" text="管理" layout_weight="1" marginLeft="6" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="13sp" cornerRadius="8" h="36"/>' +
+        '        <horizontal marginTop="16">' +
+        '          <button id="btn_run" text="▶ 执行任务" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="10" h="40" textStyle="bold"/>' +
+        '          <button id="btn_manage" text="⋯ 管理" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="10" h="40"/>' +
         '        </horizontal>' +
         '      </vertical>' +
         '    </list>' +
-        '    <vertical id="empty_view" visibility="gone" gravity="center" bg="' + C.bg + '">' +
-        '      <text text="📋" textSize="56sp" gravity="center"/>' +
-        '      <text text="暂无任务" textSize="16sp" textColor="' + C.textSecondary + '" marginTop="12" gravity="center"/>' +
-        '      <text text="点击右下角 + 添加第一个任务" textSize="12sp" textColor="' + C.textHint + '" marginTop="6" gravity="center"/>' +
+        '    <!-- 空状态 -->' +
+        '    <vertical id="empty_view" visibility="gone" gravity="center" bg="' + C.bg + '" padding="40">' +
+        '      <text text="◎" textSize="64sp" textColor="' + C.textHint + '" gravity="center"/>' +
+        '      <text text="暂无任务" textSize="18sp" textColor="' + C.textPrimary + '" marginTop="16" gravity="center" textStyle="bold"/>' +
+        '      <text text="点击下方 + 按钮添加第一个任务" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8" gravity="center"/>' +
         '    </vertical>' +
         '  </frame>' +
-        '  <horizontal bg="' + C.card + '" padding="0 4">' +
-        '    <vertical id="btn_tasks" layout_weight="1" gravity="center" padding="10 8">' +
-        '      <text text="📋" textSize="20sp" gravity="center"/>' +
-        '      <text text="任务列表" textSize="10sp" textColor="' + C.primary + '" gravity="center" marginTop="3"/>' +
+        '  <!-- 底部导航栏 -->' +
+        '  <horizontal bg="' + C.card + '" padding="8 0" cornerRadius="24 24 0 0">' +
+        '    <vertical id="btn_tasks" layout_weight="1" gravity="center" padding="12 8">' +
+        '      <text text="☰" textSize="22sp" textColor="' + C.primary + '" gravity="center"/>' +
+        '      <text text="任务列表" textSize="10sp" textColor="' + C.primary + '" gravity="center" marginTop="4"/>' +
         '    </vertical>' +
-        '    <vertical id="btn_add" layout_weight="1" gravity="center" padding="6 4">' +
-        '      <text text="+" w="48" h="48" bg="' + C.primary + '" textColor="white" textSize="28sp" gravity="center" cornerRadius="24"/>' +
+        '    <vertical id="btn_add" layout_weight="1" gravity="center" padding="8 4">' +
+        '      <text text="+" w="56" h="56" bg="' + C.primary + '" textColor="white" textSize="32sp" gravity="center" cornerRadius="28" textStyle="bold"/>' +
         '    </vertical>' +
-        '    <vertical id="btn_market" layout_weight="1" gravity="center" padding="10 8">' +
-        '      <text text="🛒" textSize="20sp" gravity="center"/>' +
-        '      <text text="任务市场" textSize="10sp" textColor="' + C.textHint + '" gravity="center" marginTop="3"/>' +
+        '    <vertical id="btn_market" layout_weight="1" gravity="center" padding="12 8">' +
+        '      <text text="☁" textSize="22sp" textColor="' + C.textHint + '" gravity="center"/>' +
+        '      <text text="任务市场" textSize="10sp" textColor="' + C.textHint + '" gravity="center" marginTop="4"/>' +
         '    </vertical>' +
         '  </horizontal>' +
         '</vertical>'

@@ -9,9 +9,9 @@
 ui.layout(
     '<vertical gravity="center" w="*" h="*" bg="#FFFFFF">' +
     '  <vertical gravity="center">' +
-    '    <text text="🚀" textSize="56sp" gravity="center"/>' +
+    '    <text text="▶" textSize="56sp" textColor="#1F6FEB" gravity="center"/>' +
     '    <text text="AutoClaw" textSize="26sp" textColor="#1A1A2E" textStyle="bold" gravity="center" marginTop="16"/>' +
-    '    <text text="自动化任务管理" textSize="13sp" textColor="#9CA3AF" gravity="center" marginTop="6"/>' +
+    '    <text text="自动化任务管理" textSize="13sp" textColor="#1F6FEB" gravity="center" marginTop="6"/>' +
     '    <progressbar indeterminate="true" style="Widget.AppCompat.ProgressBar.Horizontal" indeterminateTint="#1F6FEB" w="160" h="4" marginTop="40" cornerRadius="2"/>' +
     '  </vertical>' +
     '</vertical>'
@@ -47,13 +47,13 @@ setTimeout(function() {
         // 显示错误界面
         var errorMsg = error.message || '未知错误';
         ui.layout(
-            '<vertical gravity="center" padding="32">' +
-            '  <text text="❌" textSize="48sp" textColor="#F44336"/>' +
-            '  <text text="应用启动失败" textSize="20sp" textColor="#212121" marginTop="16"/>' +
-            '  <text id="error_msg" textSize="14sp" textColor="#757575" marginTop="8"/>' +
-            '  <text text="请检查模块文件是否完整" textSize="12sp" textColor="#9E9E9E" marginTop="4"/>' +
-            '  <button id="btn_retry" text="重试" marginTop="32" style="Widget.AppCompat.Button.Colored"/>' +
-            '  <button id="btn_check" text="检查模块" marginTop="16"/>' +
+            '<vertical gravity="center" padding="32" bg="#FFFFFF">' +
+            '  <text text="✕" textSize="48sp" textColor="#F44336"/>' +
+            '  <text text="应用启动失败" textSize="20sp" textColor="#1A1A2E" marginTop="16"/>' +
+            '  <text id="error_msg" textSize="14sp" textColor="#6B7280" marginTop="8"/>' +
+            '  <text text="请检查模块文件是否完整" textSize="12sp" textColor="#9CA3AF" marginTop="4"/>' +
+            '  <button id="btn_retry" text="↻ 重试" marginTop="32" style="Widget.AppCompat.Button.Colored"/>' +
+            '  <button id="btn_check" text="⟳ 检查模块" marginTop="16"/>' +
             '</vertical>'
         );
 

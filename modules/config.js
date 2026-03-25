@@ -13,22 +13,22 @@ module.exports = {
     storageName: 'autoclaw_data',
     backupDir: '/sdcard/AutoClaw/backups/',
     
-    // 颜色配置（白色主题 + 小米卡布里蓝）
+    // 颜色配置（清新浅色主题 + 现代化设计）
     colors: {
-        primary:       '#1F6FEB',
-        primaryDark:   '#1558C0',
-        accent:        '#1F6FEB',
-        success:       '#22C55E',
-        warning:       '#F59E0B',
-        error:         '#EF4444',
-        info:          '#1F6FEB',
-        bg:            '#FFFFFF',
-        card:          '#F5F7FA',
-        surface:       '#EEF1F6',
-        divider:       '#E2E6ED',
-        textPrimary:   '#1A1A2E',
-        textSecondary: '#6B7280',
-        textHint:      '#9CA3AF',
+        primary:       '#1F6FEB',  // 主蓝色
+        primaryDark:   '#1558C0',  // 深蓝色
+        accent:        '#1F6FEB',  // 强调蓝色
+        success:       '#22C55E',  // 成功绿色
+        warning:       '#F59E0B',  // 警告橙色
+        error:         '#EF4444',  // 错误红色
+        info:          '#1F6FEB',  // 信息蓝色
+        bg:            '#FFFFFF',  // 背景白色
+        card:          '#F5F7FA',  // 卡片背景浅灰
+        surface:       '#EEF1F6',  // 表面元素更浅灰
+        divider:       '#E2E6ED',  // 分割线浅灰
+        textPrimary:   '#1A1A2E',  // 主要文字深灰
+        textSecondary: '#6B7280',  // 次要文字中灰
+        textHint:      '#9CA3AF',  // 提示文字浅灰
         // 兼容旧引用
         background:    '#FFFFFF',
         cardBackground:'#F5F7FA'
@@ -36,11 +36,11 @@ module.exports = {
 
     // 状态映射
     statusMap: {
-        idle:    { text: '待执行', color: '#FFA726', dot: '●' },
-        running: { text: '执行中', color: '#FFA726', dot: '●' },
-        success: { text: '已完成', color: '#66BB6A', dot: '●' },
-        failed:  { text: '失败',   color: '#EF5350', dot: '●' },
-        paused:  { text: '已暂停', color: '#FFA726', dot: '●' }
+        idle:    { text: '待执行', color: '#F59E0B', dot: '●' },     // 警告橙色
+        running: { text: '执行中', color: '#1F6FEB', dot: '●' },     // 主蓝色
+        success: { text: '已完成', color: '#22C55E', dot: '●' },     // 成功绿色
+        failed:  { text: '失败',   color: '#EF4444', dot: '●' },     // 错误红色
+        paused:  { text: '已暂停', color: '#9C27B0', dot: '●' }      // 紫色
     },
     
     // 默认任务脚本
