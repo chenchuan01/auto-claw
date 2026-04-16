@@ -32,7 +32,7 @@ UIMainView.prototype.show = function() {
         '          <text id="status_tag" text="{{this.statusText}}" textSize="11sp" textColor="white" bg="{{this.statusColor}}" padding="4 8" cornerRadius="10"/>' +
         '        </horizontal>' +
         '        <!-- 第二行：描述 -->' +
-        '        <text id="task_desc" text="{{this.description}}" textSize="13sp" textColor="' + C.textSecondary + '" maxLines="1" marginTop="6" {{this.descriptionHidden}}/>' +
+        '        <text id="task_desc" text="{{this.description}}" textSize="13sp" textColor="' + C.textSecondary + '" maxLines="1" marginTop="6"/>' +
         '        <!-- 第三行：次要信息 -->' +
         '        <horizontal gravity="center_vertical" marginTop="10">' +
         '          <text text="⏱ {{this.lastRunTimeText}}" textSize="11sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
@@ -79,7 +79,6 @@ UIMainView.prototype.loadData = function() {
             id: task.id,
             name: task.name,
             description: desc,
-            descriptionHidden: desc ? '' : 'visibility="gone"',
             statusDot: statusInfo.dot,
             statusText: statusInfo.text,
             statusColor: statusInfo.color,
