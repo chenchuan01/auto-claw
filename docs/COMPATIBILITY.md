@@ -336,7 +336,7 @@ newArr.push(newItem);
 
 ## 参考资源
 
-- [AutoX.js 官方文档](https://autoxjs.dayudada.com/v7)
+- [AutoX.js 官方文档](https://github.com/kkevsekk1/AutoX)
 - [Rhino JavaScript 引擎文档](https://mozilla.github.io/rhino/)
 - [ES5 规范](https://es5.github.io/)
 

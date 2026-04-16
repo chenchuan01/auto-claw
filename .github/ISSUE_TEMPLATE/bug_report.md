@@ -10,7 +10,7 @@ assignees: ''
 简要描述遇到的问题
 
 ## 📱 环境信息
-- AutoX.js 版本: [例如 v7.0.0]
+- AutoX.js 版本: [例如 v6.0.0]
 - Android 版本: [例如 Android 12]
 - 设备型号: [例如 小米 11]
 - AutoClaw 版本: [例如 v1.0.0]

@@ -3,7 +3,7 @@
 > 基于 AutoX.js 开发的 Android 自动化任务管理工具
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![AutoX.js](https://img.shields.io/badge/AutoX.js-v7.0+-blue.svg)](https://github.com/kkevsekk1/AutoX)
+[![AutoX.js](https://img.shields.io/badge/AutoX.js-v6.0+-blue.svg)](https://github.com/kkevsekk1/AutoX)
 [![Android](https://img.shields.io/badge/Android-5.0+-green.svg)](https://developer.android.com)
 [![Version](https://img.shields.io/badge/version-1.0.0-orange.svg)](https://github.com/chenchuan01/auto-claw/releases)
 
@@ -85,7 +85,7 @@ AutoClaw/
 ### 环境要求
 
 - Android 5.0+ (API 21+)
-- [AutoX.js](https://github.com/kkevsekk1/AutoX) v7.0+
+- [AutoX.js](https://github.com/kkevsekk1/AutoX) v6.0+ (ES5 语法)
 - 开启无障碍服务权限
 
 ### 安装步骤

@@ -46,7 +46,7 @@ MarketService.prototype._getMockMarketTasks = function(options) {
             tags: ['测试', '微信', '启动应用'],
             category: '测试工具',
             price: 0,
-            requirements: ['AutoX.js v7.0+']
+            requirements: ['AutoX.js v6.0+ (ES5)']
         },
         {
             id: 'market_open_feishu',
@@ -63,7 +63,7 @@ MarketService.prototype._getMockMarketTasks = function(options) {
             tags: ['测试', '飞书', '启动应用'],
             category: '测试工具',
             price: 0,
-            requirements: ['AutoX.js v7.0+']
+            requirements: ['AutoX.js v6.0+ (ES5)']
         },
         {
             id: 'market_open_alipay',
@@ -80,7 +80,7 @@ MarketService.prototype._getMockMarketTasks = function(options) {
             tags: ['测试', '支付宝', '启动应用'],
             category: '测试工具',
             price: 0,
-            requirements: ['AutoX.js v7.0+']
+            requirements: ['AutoX.js v6.0+ (ES5)']
         },
         {
             id: 'market_device_info',
@@ -97,7 +97,7 @@ MarketService.prototype._getMockMarketTasks = function(options) {
             tags: ['测试', '设备信息', '调试'],
             category: '测试工具',
             price: 0,
-            requirements: ['AutoX.js v7.0+']
+            requirements: ['AutoX.js v6.0+ (ES5)']
         },
         {
             id: 'market_click_center',
@@ -114,7 +114,7 @@ MarketService.prototype._getMockMarketTasks = function(options) {
             tags: ['测试', '点击', '坐标'],
             category: '测试工具',
             price: 0,
-            requirements: ['AutoX.js v7.0+']
+            requirements: ['AutoX.js v6.0+ (ES5)']
         },
         {
             id: 'market_hello_world',
@@ -131,7 +131,7 @@ MarketService.prototype._getMockMarketTasks = function(options) {
             tags: ['测试', '入门', '示例'],
             category: '测试工具',
             price: 0,
-            requirements: ['AutoX.js v7.0+']
+            requirements: ['AutoX.js v6.0+ (ES5)']
         }
     ];
 

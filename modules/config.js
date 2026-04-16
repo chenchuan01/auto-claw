@@ -12,7 +12,7 @@ module.exports = {
     // 存储配置
     storageName: 'autoclaw_data',
     backupDir: '/sdcard/AutoClaw/backups/',
-    
+
     // 颜色配置（清新浅色主题 + 现代化设计）
     colors: {
         primary:       '#1F6FEB',  // 主蓝色
