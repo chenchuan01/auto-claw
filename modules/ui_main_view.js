@@ -18,11 +18,8 @@ UIMainView.prototype.show = function() {
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
-        '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
-        '    <vertical layout_weight="1">' +
-        '      <text text="AutoClaw" textSize="26sp" textColor="#FFFFFF" textStyle="bold"/>' +
-        '      <text text="自动化任务管理" textSize="12sp" textColor="#B3D1FF" marginTop="2"/>' +
-        '    </vertical>' +
+        '  <horizontal bg="' + C.primary + '" padding="20 12 16 12" gravity="center_vertical">' +
+        '    <text text="AutoClaw" textSize="26sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
         '    <text id="btn_settings" text="' + I.cog + '" textSize="22sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
         '  </horizontal>' +
         '  <!-- 任务列表区域 -->' +
