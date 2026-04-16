@@ -34,6 +34,27 @@ module.exports = {
         cardBackground:'#F5F7FA'
     },
 
+    // Font Awesome 图标（需要加载 fa-solid-900.ttf）
+    icons: {
+        play:        '\uf04b',  // 播放/执行
+        stop:        '\uf04d',  // 停止
+        xmark:       '\uf00d',  // 删除/关闭
+        pen:         '\uf303',  // 编辑
+        arrowLeft:   '\uf060',  // 返回
+        download:    '\uf019',  // 下载/导入
+        upload:      '\uf093',  // 上传/导出
+        ellipsis:    '\uf141',  // 更多
+        bars:        '\uf0c9',  // 菜单/列表
+        code:        '\uf121',  // 代码/格式化
+        star:        '\uf005',  // 星级
+        user:        '\uf007',  // 用户/作者
+        refresh:     '\uf021',  // 刷新
+        plus:        '\uf067',  // 添加
+        clipboardList: '\uf46d', // 片段
+        robot:       '\uf544',  // AI 机器人
+        comment:     '\uf075'   // 对话
+    },
+
     // 状态映射
     statusMap: {
         idle:    { text: '待执行', color: '#F59E0B', dot: '●' },     // 警告橙色

@@ -69,18 +69,18 @@ UIScriptEditor.prototype.show = function(taskId) {
         '        </horizontal>' +
         '        <horizontal padding="0 8" marginTop="12">' +
         '          <text text="任务来源" textSize="14sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
-        '          <text text="' + (task.source === 'market' ? '市场导入' : '本地创建') + '" textSize="14sp" textColor="' + C.textPrimary + '"/>' +
+        '          <text text="' + (task.source === 'market' ? '中心导入' : '本地创建') + '" textSize="14sp" textColor="' + C.textPrimary + '"/>' +
         '        </horizontal>' +
         '      </vertical>' +
         '      <!-- 操作按钮 -->' +
         '      <vertical marginTop="24">' +
         '        <horizontal>' +
-        '          <button id="btn_run_now" text="▶ 执行任务" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="15sp" cornerRadius="12" h="48" textStyle="bold"/>' +
-        '          <button id="btn_logs" text="☰ 查看日志" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="15sp" cornerRadius="12" h="48"/>' +
+        '          <button id="btn_run_now" text="▶ 执行任务" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="15sp" cornerRadius="16" h="48" textStyle="bold"/>' +
+        '          <button id="btn_logs" text="☰ 查看日志" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="15sp" cornerRadius="16" h="48"/>' +
         '        </horizontal>' +
         '        <horizontal marginTop="12">' +
-        '          <button id="btn_export" text="↑ 导出脚本" layout_weight="1" marginRight="8" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="15sp" cornerRadius="12" h="48"/>' +
-        '          <button id="btn_delete" text="✕ 删除任务" layout_weight="1" bg="' + C.error + '22" textColor="' + C.error + '" textSize="15sp" cornerRadius="12" h="48"/>' +
+        '          <button id="btn_export" text="↑ 导出脚本" layout_weight="1" marginRight="8" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="15sp" cornerRadius="16" h="48"/>' +
+        '          <button id="btn_delete" text="✕ 删除任务" layout_weight="1" bg="' + C.error + '22" textColor="' + C.error + '" textSize="15sp" cornerRadius="16" h="48"/>' +
         '        </horizontal>' +
         '      </vertical>' +
         '    </vertical>' +

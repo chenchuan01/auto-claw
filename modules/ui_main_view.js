@@ -4,6 +4,7 @@
 
 var Config = require('./config');
 var C = Config.colors;
+var I = Config.icons;
 
 function UIMainView(uiManager) {
     this.uiManager = uiManager;
@@ -40,8 +41,8 @@ UIMainView.prototype.show = function() {
         '          <text id="task_count" text="执行 {{this.runCount}} 次" textSize="12sp" textColor="' + C.textHint + '"/>' +
         '        </horizontal>' +
         '        <horizontal marginTop="16">' +
-        '          <button id="btn_run" text="▶ 执行任务" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="10" h="40" textStyle="bold"/>' +
-        '          <button id="btn_manage" text="⋯ 管理" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="10" h="40"/>' +
+        '          <button id="btn_run" text="' + I.play + ' 执行任务" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="16" h="40" textStyle="bold"/>' +
+        '          <button id="btn_manage" text="' + I.ellipsis + ' 管理" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="16" h="40"/>' +
         '        </horizontal>' +
         '      </vertical>' +
         '    </list>' +
@@ -55,15 +56,15 @@ UIMainView.prototype.show = function() {
         '  <!-- 底部导航栏 -->' +
         '  <horizontal bg="' + C.card + '" padding="8 0" cornerRadius="24 24 0 0">' +
         '    <vertical id="btn_tasks" layout_weight="1" gravity="center" padding="12 8">' +
-        '      <text text="☰" textSize="22sp" textColor="' + C.primary + '" gravity="center"/>' +
+        '      <text id="icon_tasks" text="' + I.bars + '" textSize="22sp" textColor="' + C.primary + '" gravity="center"/>' +
         '      <text text="任务列表" textSize="10sp" textColor="' + C.primary + '" gravity="center" marginTop="4"/>' +
         '    </vertical>' +
-        '    <vertical id="btn_add" layout_weight="1" gravity="center" padding="8 4">' +
-        '      <text text="+" w="56" h="56" bg="' + C.primary + '" textColor="white" textSize="32sp" gravity="center" cornerRadius="28" textStyle="bold"/>' +
+        '    <vertical id="btn_ai_chat" layout_weight="1" gravity="center" padding="8 4">' +
+        '      <text id="icon_ai_chat" text="' + I.comment + '" w="56" h="56" bg="' + C.primary + '" textColor="white" textSize="28sp" gravity="center" cornerRadius="28" textStyle="bold"/>' +
         '    </vertical>' +
         '    <vertical id="btn_market" layout_weight="1" gravity="center" padding="12 8">' +
-        '      <text text="☁" textSize="22sp" textColor="' + C.textHint + '" gravity="center"/>' +
-        '      <text text="任务市场" textSize="10sp" textColor="' + C.textHint + '" gravity="center" marginTop="4"/>' +
+        '      <text id="icon_market" text="☁" textSize="22sp" textColor="' + C.textHint + '" gravity="center"/>' +
+        '      <text text="任务中心" textSize="10sp" textColor="' + C.textHint + '" gravity="center" marginTop="4"/>' +
         '    </vertical>' +
         '  </horizontal>' +
         '</vertical>'
@@ -71,6 +72,9 @@ UIMainView.prototype.show = function() {
 
     this.loadData();
     this.bindEvents();
+
+    // 应用 Font Awesome 字体到图标
+    mgr.fontManager.apply(ui.icon_tasks, ui.icon_ai_chat, ui.icon_market);
 };
 
 UIMainView.prototype.loadData = function() {
@@ -150,7 +154,7 @@ UIMainView.prototype.bindEvents = function() {
     var mgr = this.uiManager;
 
     ui.btn_settings.on('click', function() { mgr.showSettings(); });
-    ui.btn_add.on('click', function() { mgr.dialogs.showAddTaskDialog(); });
+    ui.btn_ai_chat.on('click', function() { mgr.showAIChat(); });
     ui.btn_market.on('click', function() { mgr.showMarketView(); });
 
     ui.task_list.on('item_bind', function(itemView, itemHolder) {
@@ -162,6 +166,9 @@ UIMainView.prototype.bindEvents = function() {
         if (itemHolder && itemHolder.item && itemHolder.item.status === 'running' && statusDot) {
             self.startBlinking(statusDot, itemHolder.item.id);
         }
+
+        // 应用 Font Awesome 字体到列表项按钮
+        mgr.fontManager.apply(itemView.btn_run, itemView.btn_manage);
 
         itemView.btn_run.on('click', function() {
             if (itemHolder && itemHolder.item) {

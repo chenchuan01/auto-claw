@@ -9,6 +9,10 @@ var UITaskDetail = require('./ui_task_detail');
 var UIMarketView = require('./ui_market_view');
 var UIDialogs = require('./ui_dialogs');
 var UIScriptEditor = require('./ui_script_editor');
+var UISettings = require('./ui_settings');
+var UIAIChat = require('./ui_ai_chat');
+var FontManager = require('./font_manager');
+var AIService = require('./ai_service');
 
 function UIManager(dataManager, taskExecutor, marketService, recorder) {
     this.dataManager = dataManager;
@@ -20,11 +24,18 @@ function UIManager(dataManager, taskExecutor, marketService, recorder) {
     this.fabWindow = null;
     this.refreshInterval = null;
 
+    this.fontManager = new FontManager();
+    this.fontManager.load();
+
+    this.aiService = new AIService();
+
     this.mainView = new UIMainView(this);
     this.taskDetail = new UITaskDetail(this);
     this.marketView = new UIMarketView(this);
     this.dialogs = new UIDialogs(this);
     this.scriptEditor = new UIScriptEditor(this);
+    this.settingsView = new UISettings(this);
+    this.aiChat = new UIAIChat(this);
 }
 
 UIManager.prototype.showMainView = function() {
@@ -108,7 +119,15 @@ UIManager.prototype.showScheduleDialog = function() {
 };
 
 UIManager.prototype.showSettings = function() {
-    toast('设置功能开发中...');
+    this.currentView = 'settings';
+    this.stopAutoRefresh();
+    this.settingsView.show();
+};
+
+UIManager.prototype.showAIChat = function() {
+    this.currentView = 'ai_chat';
+    this.stopAutoRefresh();
+    this.aiChat.show();
 };
 
 UIManager.prototype.formatTime = function(timestamp) {
