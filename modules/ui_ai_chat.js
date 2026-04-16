@@ -832,6 +832,7 @@ UIAIChat.prototype.showWithScript = function(script, taskName) {
         '      <!-- 编辑器工具栏 -->' +
         '      <horizontal bg="' + C.card + '" cornerRadius="12 12 0 0" padding="12 10" gravity="center_vertical">' +
         '        <text id="script_title" text="AI 生成脚本" textSize="13sp" textColor="' + C.textSecondary + '" layout_weight="1" singleLine="true"/>' +
+        '        <text id="btn_pick_coordinate" text="' + I.target + ' 拾取坐标" textSize="12sp" textColor="' + C.primary + '" bg="' + C.primary + '22" padding="6 10" cornerRadius="8" marginRight="8"/>' +
         '        <text id="btn_format" text="格式化" textSize="12sp" textColor="' + C.primary + '" bg="' + C.primary + '22" padding="6 10" cornerRadius="8" marginRight="8"/>' +
         '        <text id="btn_clear_script" text="清空" textSize="12sp" textColor="' + C.error + '" bg="' + C.error + '22" padding="6 10" cornerRadius="8"/>' +
         '      </horizontal>' +
