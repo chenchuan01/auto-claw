@@ -13,6 +13,10 @@ function UIAIChat(uiManager) {
     this.messages = [];
     this.currentTab = 'chat'; // 'chat' 或 'script'
     this.markdownRenderer = new MarkdownRenderer();
+    this.lastTempTaskId = null; // 最近一次临时运行的任务ID
+    // 坐标拾取相关
+    this.coordinatePickerWindow = null;
+    this.isPickingCoordinate = false;
 }
 
 UIAIChat.prototype.show = function() {
@@ -58,6 +62,7 @@ UIAIChat.prototype.show = function() {
         '      <!-- 编辑器工具栏 -->' +
         '      <horizontal bg="' + C.card + '" cornerRadius="12 12 0 0" padding="12 10" gravity="center_vertical">' +
         '        <text id="script_title" text="暂无脚本" textSize="13sp" textColor="' + C.textSecondary + '" layout_weight="1" singleLine="true"/>' +
+        '        <text id="btn_pick_coordinate" text="' + I.target + ' 拾取坐标" textSize="12sp" textColor="' + C.primary + '" bg="' + C.primary + '22" padding="6 10" cornerRadius="8" marginRight="8"/>' +
         '        <text id="btn_format" text="格式化" textSize="12sp" textColor="' + C.primary + '" bg="' + C.primary + '22" padding="6 10" cornerRadius="8" marginRight="8"/>' +
         '        <text id="btn_clear_script" text="清空" textSize="12sp" textColor="' + C.error + '" bg="' + C.error + '22" padding="6 10" cornerRadius="8"/>' +
         '      </horizontal>' +
@@ -76,7 +81,10 @@ UIAIChat.prototype.show = function() {
         '      </horizontal>' +
         '      <!-- 底部按钮 -->' +
         '      <horizontal marginTop="12">' +
-        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.success + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="8" textStyle="bold"/>' +
+        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.success + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="4" textStyle="bold"/>' +
+        '        <button id="btn_view_logs" text="' + I.clock + ' 日志" bg="' + C.info + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" visibility="gone"/>' +
+        '      </horizontal>' +
+        '      <horizontal marginTop="8">' +
         '        <button id="btn_save_task" text="' + I.save + ' 保存任务" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" textStyle="bold"/>' +
         '      </horizontal>' +
         '    </vertical>' +
@@ -90,7 +98,7 @@ UIAIChat.prototype.show = function() {
     );
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_save_task, ui.btn_run_script, ui.btn_send);
+    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_send);
 
     // 显示欢迎消息
     if (self.messages.length === 0) {
@@ -136,6 +144,10 @@ UIAIChat.prototype.show = function() {
         self.runScript();
     });
 
+    ui.btn_view_logs.on('click', function() {
+        self.viewTempTaskLogs();
+    });
+
     ui.btn_clear_script.on('click', function() {
         dialogs.confirm('清空脚本', '确定要清空编辑器中的脚本吗？', function(confirmed) {
             if (confirmed) {
@@ -144,6 +156,10 @@ UIAIChat.prototype.show = function() {
                 self.updateLineNumbers();
             }
         });
+    });
+
+    ui.btn_pick_coordinate.on('click', function() {
+        self.startCoordinatePicker();
     });
 
     ui.btn_format.on('click', function() {
@@ -349,7 +365,7 @@ UIAIChat.prototype.renderMessages = function() {
                             codeBlock.code_toggle.setText(I.arrowDown);
                         } else {
                             codeBlock.code_content.attr('visibility', 'gone');
-                            codeBlock.code_toggle.setText(I.arrowRight);
+                            codeBlock.code_toggle.setText(I.arrowLeft);
                         }
                         // 应用字体到图标
                         self.uiManager.fontManager.apply(codeBlock.code_toggle, codeBlock.code_title);
@@ -406,6 +422,17 @@ UIAIChat.prototype.sendMessage = function() {
             // 更新脚本预览
             self.updateScriptPreview();
         }
+
+        // AI回复完成后，自动聚焦输入框，方便连续对话
+        ui.post(function() {
+            // 只有在对话tab才聚焦
+            if (self.currentTab === 'chat') {
+                ui.input_message.requestFocus();
+                // 显示输入法
+                var imm = context.getSystemService(android.view.inputmethod.InputMethodManager);
+                imm.showSoftInput(ui.input_message, 0);
+            }
+        });
     });
 };
 
@@ -440,6 +467,8 @@ UIAIChat.prototype.updateLineNumbers = function() {
 };
 
 UIAIChat.prototype.runScript = function() {
+    var self = this;
+    var mgr = this.uiManager;
     var code = ui.script_editor.getText().toString().trim();
 
     if (!code) {
@@ -448,17 +477,274 @@ UIAIChat.prototype.runScript = function() {
     }
 
     dialogs.confirm('运行脚本', '确定要运行当前脚本吗？', function(confirmed) {
-        if (confirmed) {
-            try {
-                engines.execScript('AI 生成脚本', code, {
-                    engineType: 'rhino'
-                });
-                toast('脚本已开始运行');
-            } catch (e) {
-                toast('运行失败: ' + e.message);
-                console.error('[AI Chat] 运行脚本失败:', e);
-            }
+        if (!confirmed) return;
+
+        // 创建一个临时任务来记录日志
+        var tempTaskId = 'temp_ai_' + Date.now();
+        var tempTask = {
+            id: tempTaskId,
+            name: 'AI 临时运行脚本',
+            description: 'AI 对话中临时运行的脚本',
+            script: code,
+            status: 'idle',
+            createdAt: Date.now(),
+            lastRunTime: null,
+            runCount: 0
+        };
+
+        // 添加到数据管理器（不持久化，只在内存中）
+        mgr.dataManager.addTemporaryTask(tempTask);
+        self.lastTempTaskId = tempTaskId;
+
+        // 执行任务并记录日志
+        var success = mgr.taskExecutor.executeTask(tempTaskId);
+
+        if (success) {
+            // 显示查看日志按钮
+            ui.post(function() {
+                ui.btn_view_logs.attr('visibility', 'visible');
+            });
+            toast('脚本已开始运行，运行完成后可点击查看日志');
+        } else {
+            // 执行失败也要显示日志按钮查看错误
+            ui.post(function() {
+                ui.btn_view_logs.attr('visibility', 'visible');
+            });
         }
+    });
+};
+
+/**
+ * 查看临时运行任务的日志
+ */
+UIAIChat.prototype.viewTempTaskLogs = function() {
+    var self = this;
+    var mgr = this.uiManager;
+
+    if (!this.lastTempTaskId) {
+        toast('暂无日志，请先运行脚本');
+        return;
+    }
+
+    // 直接跳转到日志页面
+    mgr.showTaskLogs(this.lastTempTaskId);
+};
+
+/**
+ * 启动坐标拾取器（悬浮窗）
+ */
+UIAIChat.prototype.startCoordinatePicker = function() {
+    var self = this;
+    var mgr = this.uiManager;
+
+    // 检查悬浮窗权限
+    if (!floaty.checkPermission()) {
+        floaty.requestPermission(function(granted) {
+            if (granted) {
+                self.doStartCoordinatePicker();
+            } else {
+                toast('需要悬浮窗权限才能使用坐标拾取');
+            }
+        });
+        return;
+    }
+
+    this.doStartCoordinatePicker();
+};
+
+/**
+ * 实际创建坐标拾取悬浮窗
+ */
+UIAIChat.prototype.doStartCoordinatePicker = function() {
+    var self = this;
+    var mgr = this.uiManager;
+
+    if (this.isPickingCoordinate) {
+        toast('坐标拾取已经在运行了');
+        return;
+    }
+
+    this.isPickingCoordinate = true;
+
+    // 在新线程创建悬浮窗
+    threads.start(function() {
+        // 使用一个简单布局，手动创建控件 - 这样更可靠
+        var window = floaty.window(
+            '<vertical padding="8" bg="#00000000">' +
+            '</vertical>'
+        );
+
+        // 手动创建所有控件
+        var context = context;
+        var container = new android.widget.LinearLayout(context);
+        container.setOrientation(android.widget.LinearLayout.VERTICAL);
+        container.setGravity(android.view.Gravity.CENTER);
+        container.setLayoutParams(new android.widget.FrameLayout.LayoutParams(
+            android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+            android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
+        ));
+
+        // 十字准星 - 用一个固定大小的 FrameLayout
+        var crosshairFrame = new android.widget.FrameLayout(context);
+        crosshairFrame.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+            Math.round(160 * context.getResources().getDisplayMetrics().density),
+            Math.round(160 * context.getResources().getDisplayMetrics().density)
+        ));
+
+        // 添加四个角
+        var textPaint = new android.text.TextPaint();
+        textPaint.setColor(0xAAFF0000);
+        textPaint.setTextSize(40 * context.getResources().getDisplayMetrics().density);
+        textPaint.setAntiAlias(true);
+
+        // 由于动态创建比较复杂，改用简单方式，直接在XML中写出但不依赖id绑定
+        window.setContentView(
+            '<frame bg="#00000000" w="*" h="*">' +
+            '  <vertical w="wrap_content" h="wrap_content" gravity="center" layout_gravity="center">' +
+            '    <!-- 圆形半透明背景 + 十字准星 -->' +
+            '    <frame w="140" h="140" gravity="center">' +
+            '      <!-- 圆形背景 - 用text模拟 -->' +
+            '      <text text="" w="140" h="140" bg="#00000088" gravity="center" cornerRadius="70"/>' +
+            '      <!-- 水平十字线 -->' +
+            '      <text text="" bg="#FF0000AA" h="2" w="120" gravity="center"/>' +
+            '      <!-- 垂直十字线 -->' +
+            '      <text text="" bg="#FF0000AA" w="2" h="120" gravity="center"/>' +
+            '      <!-- 中心点 -->' +
+            '      <text text="" w="8" h="8" bg="#FF0000AA" gravity="center" cornerRadius="4"/>' +
+            '    </frame>' +
+            '    <text text="点击圆形获取坐标" textSize="12sp" textColor="#FFFFFF" bg="#80000000" padding="6 3" gravity="center" cornerRadius="4" marginTop="4"/>' +
+            '  </vertical>' +
+            '</frame>'
+        );
+
+        // 遍历获取所有子控件
+        var root = window.getDecorView();
+        // 结构: root (frame) → vertical → [crosshair frame, coord text]
+        var outerFrame = root;
+        var vertical = outerFrame.getChildAt(0);
+        var coordText = vertical.getChildAt(1);
+
+        // 保存引用
+        window.container = vertical;
+        window.coord_text = coordText;
+
+        // 设置窗口可拖动（整个区域都可拖动）
+        // 点击就是拾取，拖动就是移动
+        vertical.setOnTouchListener(function(view, event) {
+            var action = event.getAction();
+            if (action == android.view.MotionEvent.ACTION_DOWN) {
+                var x = event.getRawX();
+                var y = event.getRawY();
+                self.lastX = x;
+                self.lastY = y;
+                self.dragging = false;
+                return true;
+            } else if (action == android.view.MotionEvent.ACTION_MOVE) {
+                var dx = event.getRawX() - self.lastX;
+                var dy = event.getRawY() - self.lastY;
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    self.dragging = true;
+                }
+                window.setPosition(
+                    window.getX() + dx,
+                    window.getY() + dy
+                );
+                self.lastX = event.getRawX();
+                self.lastY = event.getRawY();
+                return true;
+            } else if (action == android.view.MotionEvent.ACTION_UP) {
+                if (!self.dragging) {
+                    // 不是拖动，就是点击，获取坐标
+                    self.pickCoordinate(window);
+                }
+                return true;
+            }
+            return false;
+        });
+
+        window.setTouchable(true);
+        window.setFocusable(false);
+        self.coordinatePickerWindow = window;
+
+        ui.run(function() {
+            toast('拖动圆形到目标位置点击，自动拾取坐标并插入');
+        });
+    });
+};
+
+/**
+ * 拾取当前坐标并插入到编辑器
+ */
+UIAIChat.prototype.pickCoordinate = function(window) {
+    var self = this;
+    // 获取屏幕中心坐标（窗口中心就是十字中心）
+    var screenWidth = device.width;
+    var screenHeight = device.height;
+    var windowX = window.getX();
+    var windowY = window.getY();
+    var windowWidth = window.getWidth();
+    var windowHeight = window.getHeight();
+
+    // 计算十字中心的实际屏幕坐标
+    var x = Math.round(windowX + windowWidth / 2);
+    var y = Math.round(windowY + windowHeight / 2);
+
+    // 插入到脚本编辑器的光标当前位置
+    ui.run(function() {
+        try {
+            var editor = ui.script_editor;
+            var insertion = 'click(' + x + ', ' + y + ');';
+
+            // 获取当前文本和光标位置
+            var editable = editor.getEditableText();
+            var selectionStart = editor.getSelectionStart();
+            var selectionEnd = editor.getSelectionEnd();
+
+            if (editable != null) {
+                // 在光标位置插入
+                editable.replace(selectionStart, selectionEnd, insertion);
+                // 光标移到插入内容后
+                editor.setSelection(selectionStart + insertion.length);
+            } else {
+                //  fallback: 整个替换
+                var currentCode = '';
+                var textObj = editor.getText();
+                if (textObj) {
+                    currentCode = textObj.toString();
+                }
+                var newCode = currentCode.substring(0, selectionStart) + insertion + currentCode.substring(selectionEnd);
+                editor.setText(newCode);
+                editor.setSelection(selectionStart + insertion.length);
+            }
+
+            self.updateLineNumbers();
+            toast('坐标已插入: ' + x + ', ' + y);
+            // 自动关闭悬浮窗
+            self.stopCoordinatePicker(window);
+        } catch(e) {
+            console.error('插入到编辑器失败:', e);
+            toast('坐标获取成功: ' + x + ', ' + y + ', 请手动复制');
+            setClip('click(' + x + ', ' + y + ');');
+            self.stopCoordinatePicker(window);
+        }
+    });
+};
+
+/**
+ * 停止坐标拾取
+ */
+UIAIChat.prototype.stopCoordinatePicker = function(window) {
+    if (window) {
+        window.close();
+    }
+    if (this.coordinatePickerWindow) {
+        this.coordinatePickerWindow.close();
+        this.coordinatePickerWindow = null;
+    }
+    this.isPickingCoordinate = false;
+    this.dragging = false;
+    ui.run(function() {
+        toast('坐标拾取已结束');
     });
 };
 
@@ -564,7 +850,10 @@ UIAIChat.prototype.showWithScript = function(script, taskName) {
         '      </horizontal>' +
         '      <!-- 底部按钮 -->' +
         '      <horizontal marginTop="12">' +
-        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.success + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="8" textStyle="bold"/>' +
+        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.success + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="4" textStyle="bold"/>' +
+        '        <button id="btn_view_logs" text="' + I.clock + ' 日志" bg="' + C.info + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" visibility="gone"/>' +
+        '      </horizontal>' +
+        '      <horizontal marginTop="8">' +
         '        <button id="btn_save_task" text="' + I.save + ' 保存任务" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" textStyle="bold"/>' +
         '      </horizontal>' +
         '    </vertical>' +
@@ -578,7 +867,7 @@ UIAIChat.prototype.showWithScript = function(script, taskName) {
     );
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_save_task, ui.btn_run_script, ui.btn_send);
+    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_send);
 
     // 添加初始提示消息，包含要编辑的脚本
     var prompt = '请帮我优化/修改这个脚本：\n\n```javascript\n' + script + '\n```';
@@ -625,6 +914,10 @@ UIAIChat.prototype.showWithScript = function(script, taskName) {
         self.runScript();
     });
 
+    ui.btn_view_logs.on('click', function() {
+        self.viewTempTaskLogs();
+    });
+
     ui.btn_clear_script.on('click', function() {
         dialogs.confirm('清空脚本', '确定要清空编辑器中的脚本吗？', function(confirmed) {
             if (confirmed) {
@@ -633,6 +926,10 @@ UIAIChat.prototype.showWithScript = function(script, taskName) {
                 self.updateLineNumbers();
             }
         });
+    });
+
+    ui.btn_pick_coordinate.on('click', function() {
+        self.startCoordinatePicker();
     });
 
     ui.btn_format.on('click', function() {

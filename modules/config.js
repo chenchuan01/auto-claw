@@ -72,6 +72,8 @@ module.exports = {
         info:        '\uf129',  // 信息
         calendar:    '\uf073',   // 日历
         paperPlane:  '\uf1d8',  // 纸飞机（发送）
+        crosshairs:  '\uf05b',  // 十字准星（坐标拾取）
+        target:      '\uf05b',  // 目标（别名）
     },
 
     // 状态映射

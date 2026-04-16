@@ -37,13 +37,37 @@ TaskExecutor.prototype.executeTask = function(taskId) {
 
         // 监控脚本完成
         threads.start(function() {
-            execution.waitFor();
-            if (self.runningTasks[taskId] === engine) {
-                delete self.runningTasks[taskId];
+            var exitCode = -1;
+            try {
+                execution.waitFor();
+                exitCode = execution.getEngine().captureStackTrace();
+            } catch (e) {
+                // 等待过程中发生异常
+                self.addTaskLog(taskId, '✕ 执行异常: ' + e.message);
+            } finally {
+                // 不管怎样，都清理运行记录并更新状态
+                if (self.runningTasks[taskId] === engine) {
+                    delete self.runningTasks[taskId];
+                }
                 var currentTask = self.dataManager.getTaskById(taskId);
-                if (currentTask && currentTask.status === 'running') {
-                    self.dataManager.updateTask(taskId, { status: 'success' });
-                    self.addTaskLog(taskId, '[OK] 任务执行完成');
+                if (currentTask) {
+                    // 如果任务还在运行状态，说明它正常执行完成了
+                    // 如果已经被停止，就保持停止状态
+                    if (currentTask.status === 'running') {
+                        // 检查引擎是否真的执行成功
+                        var isSuccess = true;
+                        try {
+                            isSuccess = !execution.getEngine().isAlive();
+                        } catch(e) {}
+                        self.dataManager.updateTask(taskId, {
+                            status: isSuccess ? 'success' : 'failed'
+                        });
+                        if (isSuccess) {
+                            self.addTaskLog(taskId, '[OK] 任务执行完成');
+                        } else {
+                            self.addTaskLog(taskId, '✕ 任务执行失败');
+                        }
+                    }
                 }
                 self.addTaskLog(taskId, '[END] 任务执行结束: ' + new Date().toLocaleString());
             }

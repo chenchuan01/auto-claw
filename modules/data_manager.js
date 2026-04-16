@@ -7,6 +7,7 @@ var Config = require('./config');
 
 function DataManager() {
     this.storage = storages.create(Config.storageName);
+    this.tempTasks = []; // 内存中的临时任务（不持久化）
     this.initStorage();
 }
 
@@ -27,6 +28,10 @@ DataManager.prototype.getTaskById = function(taskId) {
     var tasks = this.getTasks();
     for (var i = 0; i < tasks.length; i++) {
         if (tasks[i].id === taskId) return tasks[i];
+    }
+    // 找不到，再查找临时任务
+    for (var j = 0; j < this.tempTasks.length; j++) {
+        if (this.tempTasks[j].id === taskId) return this.tempTasks[j];
     }
     return null;
 };
@@ -61,13 +66,47 @@ DataManager.prototype.addTask = function(taskData) {
     return task;
 };
 
+/**
+ * 添加临时任务（仅在内存中，不持久化）
+ * 用于 AI 对话中临时运行脚本
+ */
+DataManager.prototype.addTemporaryTask = function(taskData) {
+    this.tempTasks.push(taskData);
+    // 清理超过 10 个旧临时任务
+    if (this.tempTasks.length > 10) {
+        this.tempTasks.shift();
+    }
+    return taskData.id;
+};
+
 DataManager.prototype.updateTask = function(taskId, updates) {
     var tasks = this.getTasks();
     var index = -1;
     for (var i = 0; i < tasks.length; i++) {
         if (tasks[i].id === taskId) { index = i; break; }
     }
-    if (index === -1) return null;
+    if (index === -1) {
+        // 找不到，尝试更新临时任务
+        for (var j = 0; j < this.tempTasks.length; j++) {
+            if (this.tempTasks[j].id === taskId) {
+                var original = this.tempTasks[j];
+                var updated = {};
+                for (var k in original) {
+                    if (original.hasOwnProperty(k)) updated[k] = original[k];
+                }
+                for (var k in updates) {
+                    if (updates.hasOwnProperty(k)) updated[k] = updates[k];
+                }
+                updated.id = original.id;
+                if (original.createTime) {
+                    updated.createTime = original.createTime;
+                }
+                this.tempTasks[j] = updated;
+                return updated;
+            }
+        }
+        return null;
+    }
 
     var original = tasks[index];
     var updated = {};
@@ -86,11 +125,17 @@ DataManager.prototype.updateTask = function(taskId, updates) {
 };
 
 DataManager.prototype.deleteTask = function(taskId) {
+    // 先尝试删除持久化任务
     var tasks = this.getTasks();
     var newTasks = tasks.filter(function(t) { return t.id !== taskId; });
-    if (newTasks.length === tasks.length) return false;
-    this.storage.put('tasks', newTasks);
-    return true;
+    if (newTasks.length !== tasks.length) {
+        this.storage.put('tasks', newTasks);
+        return true;
+    }
+    // 找不到，尝试删除临时任务
+    var originalLen = this.tempTasks.length;
+    this.tempTasks = this.tempTasks.filter(function(t) { return t.id !== taskId; });
+    return this.tempTasks.length !== originalLen;
 };
 
 DataManager.prototype.deleteTasks = function(taskIds) {
