@@ -25,21 +25,23 @@ UIMainView.prototype.show = function() {
         '  <!-- 任务列表区域 -->' +
         '  <frame layout_weight="1">' +
         '    <list id="task_list" bg="' + C.bg + '">' +
-        '      <vertical margin="12 16 12 16" bg="' + C.card + '" cornerRadius="18" padding="18" w="*">' +
+        '      <vertical margin="12 12 12 12" bg="' + C.card + '" cornerRadius="16" padding="16" w="*">' +
+        '        <!-- 第一行：任务名称 + 状态标签 -->' +
         '        <horizontal gravity="center_vertical">' +
-        '          <text id="status_dot" text="{{this.statusDot}}" textSize="18sp" textColor="{{this.statusColor}}" marginRight="10"/>' +
-        '          <vertical layout_weight="1">' +
-        '            <text id="task_name" text="{{this.name}}" textSize="17sp" textColor="' + C.textPrimary + '" textStyle="bold"/>' +
-        '            <text id="task_desc" text="{{this.description}}" textSize="13sp" textColor="' + C.textSecondary + '" maxLines="1" marginTop="4"/>' +
-        '          </vertical>' +
+        '          <text id="task_name" text="{{this.name}}" textSize="19sp" textColor="' + C.textPrimary + '" textStyle="bold" layout_weight="1"/>' +
+        '          <text id="status_tag" text="{{this.statusText}}" textSize="11sp" textColor="white" bg="{{this.statusColor}}" padding="4 8" cornerRadius="10"/>' +
         '        </horizontal>' +
-        '        <horizontal marginTop="14" gravity="center_vertical">' +
-        '          <text id="task_time" text="{{this.lastRunTimeText}}" textSize="12sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
-        '          <text id="task_count" text="执行 {{this.runCount}} 次" textSize="12sp" textColor="' + C.textHint + '"/>' +
+        '        <!-- 第二行：描述 -->' +
+        '        <text id="task_desc" text="{{this.description}}" textSize="13sp" textColor="' + C.textSecondary + '" maxLines="1" marginTop="6" {{this.descriptionHidden}}"/>' +
+        '        <!-- 第三行：次要信息 -->' +
+        '        <horizontal gravity="center_vertical" marginTop="10">' +
+        '          <text text="⏱ {{this.lastRunTimeText}}" textSize="11sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
+        '          <text text="🔁 {{this.runCount}} 次" textSize="11sp" textColor="' + C.textHint + '"/>' +
         '        </horizontal>' +
-        '        <horizontal marginTop="16">' +
-        '          <button id="btn_run" text="' + I.play + ' 执行" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="16" h="40" textStyle="bold"/>' +
-        '          <button id="btn_manage" text="' + I.ellipsis + ' 管理" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="16" h="40"/>' +
+        '        <!-- 操作按钮 -->' +
+        '        <horizontal marginTop="12">' +
+        '          <button id="btn_run" text="' + I.play + ' 执行" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="12" h="42" textStyle="bold"/>' +
+        '          <button id="btn_manage" text="' + I.ellipsis + ' 管理" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="12" h="42"/>' +
         '        </horizontal>' +
         '      </vertical>' +
         '    </list>' +
@@ -72,11 +74,14 @@ UIMainView.prototype.loadData = function() {
 
     var tasks = mgr.dataManager.getTasks().map(function(task) {
         var statusInfo = Config.statusMap[task.status] || Config.statusMap.idle;
+        var desc = task.description || '';
         return {
             id: task.id,
             name: task.name,
-            description: task.description || '暂无描述',
+            description: desc,
+            descriptionHidden: desc ? '' : 'visibility="gone"',
             statusDot: statusInfo.dot,
+            statusText: statusInfo.text,
             statusColor: statusInfo.color,
             status: task.status,
             lastRunTimeText: mgr.formatTime(task.lastRunTime),
