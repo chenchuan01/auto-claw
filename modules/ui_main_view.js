@@ -45,11 +45,7 @@ UIMainView.prototype.show = function() {
         '    </list>' +
         '    <!-- 空状态 -->' +
         '    <vertical id="empty_view" visibility="gone" gravity="center" bg="' + C.bg + '" padding="40">' +
-        '      <text text="' + I.spinner + '" textSize="58sp" textColor="' + C.textHint + '" gravity="center"/>' +
-        '      <text text="暂无任务" textSize="18sp" textColor="' + C.textPrimary + '" marginTop="16" gravity="center" textStyle="bold"/>' +
-        '      <text text="你可以：" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="16" gravity="center"/>' +
-        '      <text text="• 使用 AI 对话创建任务" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8" gravity="center"/>' +
-        '      <text text="• 从任务中心下载任务" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="4" gravity="center"/>' +
+        '      <text text="' + I.clipboardList + '" textSize="88sp" textColor="' + C.textHint + '" gravity="center"/>' +
         '    </vertical>' +
         '  </frame>' +
         mgr.buildBottomNav('tasks') +
@@ -59,6 +55,8 @@ UIMainView.prototype.show = function() {
     this.bindEvents();
     mgr.bindBottomNav();
     mgr.fontManager.apply(ui.btn_settings);
+    // 应用字体到空状态图标
+    mgr.fontManager.apply(ui.empty_view.getChildAt(0));
 
     ui.post(function() {
         self.loadData();
