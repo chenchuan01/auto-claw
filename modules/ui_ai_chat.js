@@ -42,7 +42,7 @@ UIAIChat.prototype.show = function() {
         '    <horizontal id="tab_chat" layout_weight="1" gravity="center" padding="12 8" bg="' + C.primary + '22" cornerRadius="12" marginRight="4">' +
         '      <text text="' + I.comment + ' 对话" textSize="15sp" textColor="' + C.primary + '" textStyle="bold"/>' +
         '    </horizontal>' +
-        '    <horizontal id="tab_script" layout_weight="1" gravity="center" padding="12 8" bg="transparent" cornerRadius="12" marginLeft="4">' +
+        '    <horizontal id="tab_script" layout_weight="1" gravity="center" padding="12 8" bg="#00000000" cornerRadius="12" marginLeft="4">' +
         '      <text text="' + I.code + ' 脚本" textSize="15sp" textColor="' + C.textSecondary + '"/>' +
         '    </horizontal>' +
         '  </horizontal>' +
@@ -135,7 +135,7 @@ UIAIChat.prototype.switchTab = function(tab) {
         ui.tab_chat.findViewByText(I.comment + ' 对话').attr('textColor', C.primary);
         ui.tab_chat.findViewByText(I.comment + ' 对话').attr('textStyle', 'bold');
 
-        ui.tab_script.attr('bg', 'transparent');
+        ui.tab_script.attr('bg', '#00000000');
         ui.tab_script.findViewByText(I.code + ' 脚本').attr('textColor', C.textSecondary);
         ui.tab_script.findViewByText(I.code + ' 脚本').attr('textStyle', 'normal');
     } else {
@@ -143,7 +143,7 @@ UIAIChat.prototype.switchTab = function(tab) {
         ui.view_script.attr('visibility', 'visible');
         ui.input_area.attr('visibility', 'gone');
 
-        ui.tab_chat.attr('bg', 'transparent');
+        ui.tab_chat.attr('bg', '#00000000');
         ui.tab_chat.findViewByText(I.comment + ' 对话').attr('textColor', C.textSecondary);
         ui.tab_chat.findViewByText(I.comment + ' 对话').attr('textStyle', 'normal');
 
