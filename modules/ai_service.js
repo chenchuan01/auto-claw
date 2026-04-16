@@ -26,6 +26,12 @@ AIService.prototype.loadSystemPrompt = function() {
         '- AutoX.js v6 使用 ES5 语法（Rhino 引擎）\n' +
         '- ❌ 不支持：箭头函数、let/const、模板字符串、解构、class、async/await、Promise\n' +
         '- ✅ 只能使用：var 声明变量、function 关键字、传统字符串拼接\n\n' +
+        '## 命名规范（必须严格遵守）\n' +
+        '- ✅ 变量名、函数名必须使用英文：userName、clickButton、findWidget\n' +
+        '- ✅ 可以使用拼音但必须全拼音：weixinBtn、qiandaoTask\n' +
+        '- ❌ 禁止中英文混杂：user用户、点击Button、微信App\n' +
+        '- ❌ 禁止使用中文标识符：var 用户名、function 点击按钮()\n' +
+        '- 注释和字符串内容可以使用中文\n\n' +
         '## 核心 API 模块\n' +
         '1. app - 应用管理（启动应用、获取包名）\n' +
         '2. console - 控制台日志\n' +
@@ -48,7 +54,11 @@ AIService.prototype.loadSystemPrompt = function() {
         '3. 添加延迟：sleep(1000)\n' +
         '4. 错误处理：try-catch 包裹关键操作\n' +
         '5. 检查控件存在性：if (widget) { widget.click(); }\n' +
-        '6. 添加日志：console.log()、toast()\n\n' +
+        '6. 添加日志：console.log()、toast()\n' +
+        '7. 【重要】点击任何元素前必须先等待其渲染完成，使用 waitFor 而不是直接 click：\n' +
+        '   ❌ 错误：text("我的").click()\n' +
+        '   ✅ 正确：text("我的").waitFor(); text("我的").findOne().click()\n' +
+        '   ✅ 或者：var btn = text("我的").findOne(5000); if (btn) { btn.click(); }\n\n' +
         '## 代码输出格式\n' +
         '当生成脚本代码时，请使用 Markdown 代码块格式：\n' +
         '```javascript\n' +
@@ -81,6 +91,7 @@ AIService.prototype.sendMessage = function(messages, callback) {
 
     if (config.messageFormat === 'openai') {
         // OpenAI 格式
+        // 火山引擎 OpenAI 兼容 base URL: https://ark.cn-beijing.volces.com/api/coding/v3
         requestData = {
             model: config.model,
             messages: [
@@ -89,16 +100,15 @@ AIService.prototype.sendMessage = function(messages, callback) {
             temperature: 0.7
         };
 
-        // 确保 endpoint 以 /chat/completions 结尾
-        if (!endpoint.endsWith('/chat/completions')) {
-            if (endpoint.endsWith('/')) {
-                endpoint += 'chat/completions';
-            } else {
-                endpoint += '/chat/completions';
-            }
+        // 始终拼接 /chat/completions
+        if (endpoint.endsWith('/')) {
+            endpoint += 'chat/completions';
+        } else {
+            endpoint += '/chat/completions';
         }
     } else {
         // Anthropic 格式
+        // 火山引擎 Anthropic 兼容 base URL: https://ark.cn-beijing.volces.com/api/coding
         requestData = {
             model: config.model,
             max_tokens: 4096,
@@ -106,13 +116,11 @@ AIService.prototype.sendMessage = function(messages, callback) {
             messages: messages
         };
 
-        // 确保 endpoint 以 /messages 结尾
-        if (!endpoint.endsWith('/messages')) {
-            if (endpoint.endsWith('/')) {
-                endpoint += 'messages';
-            } else {
-                endpoint += '/messages';
-            }
+        // 始终拼接 /v1/messages
+        if (endpoint.endsWith('/')) {
+            endpoint += 'v1/messages';
+        } else {
+            endpoint += '/v1/messages';
         }
     }
 
@@ -125,14 +133,36 @@ AIService.prototype.sendMessage = function(messages, callback) {
             if (config.messageFormat === 'openai') {
                 headers['Authorization'] = 'Bearer ' + config.apiKey;
             } else {
-                headers['x-api-key'] = config.apiKey;
+                // Anthropic 格式也用 Bearer（火山引擎兼容）
+                headers['Authorization'] = 'Bearer ' + config.apiKey;
                 headers['anthropic-version'] = '2023-06-01';
             }
+
+            // 打印请求信息用于调试
+            console.log('========== AI 请求信息 ==========');
+            console.log('格式: ' + config.messageFormat);
+            console.log('完整 URL: ' + endpoint);
+            console.log('模型: ' + config.model);
+
+            // 生成 curl 命令
+            var curlCmd = 'curl -X POST "' + endpoint + '" \\\n';
+            for (var key in headers) {
+                if (headers.hasOwnProperty(key)) {
+                    curlCmd += '  -H "' + key + ': ' + headers[key] + '" \\\n';
+                }
+            }
+            curlCmd += '  -d \'' + JSON.stringify(requestData) + '\'';
+
+            console.log('\ncurl 命令（可直接复制测试）:');
+            console.log(curlCmd);
+            console.log('================================\n');
 
             var response = http.postJson(endpoint, requestData, {
                 headers: headers,
                 timeout: 60000
             });
+
+            console.log('响应状态码:', response.statusCode);
 
             if (response.statusCode === 200) {
                 var result = response.body.json();

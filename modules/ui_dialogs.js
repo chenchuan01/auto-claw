@@ -53,14 +53,13 @@ UIDialogs.prototype.showTaskManagement = function(taskId) {
     var mgr = this.uiManager;
     var task = mgr.dataManager.getTaskById(taskId);
     if (!task) return;
-    var options = ['查看详情', '编辑脚本', '查看日志', '导出脚本', '定时执行', '删除任务'];
+    var options = ['查看详情', '编辑脚本', '查看日志', '定时执行', '删除任务'];
     dialogs.select('任务管理', options, function(index) {
         if (index < 0) return;
         switch (options[index]) {
             case '查看详情': mgr.showTaskDetail(taskId); break;
             case '编辑脚本': mgr.showScriptEditor(taskId); break;
             case '查看日志': self.showTaskLogs(taskId); break;
-            case '导出脚本': mgr.exportTaskScript(taskId); break;
             case '定时执行': mgr.showScheduleDialog(taskId); break;
             case '删除任务': self.confirmDeleteTask(taskId); break;
         }
@@ -82,37 +81,8 @@ UIDialogs.prototype.confirmDeleteTask = function(taskId) {
 };
 
 UIDialogs.prototype.showTaskLogs = function(taskId) {
-    var self = this;
     var mgr = this.uiManager;
-    var task = mgr.dataManager.getTaskById(taskId);
-    if (!task) return;
-    var logs = mgr.taskExecutor.getTaskLogs(taskId);
-    var logText = logs.length > 0 ? logs.join('\n') : '暂无日志';
-
-    var hasError = false;
-    var errorText = '';
-    for (var i = 0; i < logs.length; i++) {
-        if (logs[i].indexOf('✕') !== -1 || logs[i].indexOf('错误') !== -1 || logs[i].indexOf('失败') !== -1) {
-            hasError = true;
-            errorText += logs[i] + '\n';
-        }
-    }
-
-    if (hasError) {
-        dialogs.build({
-            title: '任务日志 - ' + task.name,
-            content: logText,
-            positive: '确定',
-            neutral: '复制报错'
-        }).on('positive', function() {
-            // 关闭对话框
-        }).on('neutral', function() {
-            setClip(errorText);
-            toast('报错信息已复制到剪贴板');
-        }).show();
-    } else {
-        dialogs.alert('任务日志 - ' + task.name, logText);
-    }
+    mgr.showTaskLogs(taskId);
 };
 
 UIDialogs.prototype.importMarketTask = function(marketTask) {
@@ -125,7 +95,9 @@ UIDialogs.prototype.importMarketTask = function(marketTask) {
                 description: marketTask.description,
                 script: marketTask.script,
                 source: 'market',
-                marketId: marketTask.id
+                marketId: marketTask.id,
+                author: marketTask.author || '系统',
+                authorId: marketTask.authorId || 'system'
             });
             toast('任务导入成功');
             mgr.showMainView();

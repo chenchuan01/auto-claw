@@ -46,6 +46,8 @@ DataManager.prototype.addTask = function(taskData) {
         runCount: 0,
         source: taskData.source || 'local',
         marketId: taskData.marketId || null,
+        author: taskData.author || '本地创建',
+        authorId: taskData.authorId || 'local',
         tags: taskData.tags || []
     };
 

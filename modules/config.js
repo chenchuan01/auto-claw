@@ -39,10 +39,11 @@ module.exports = {
         play:        '\uf04b',  // 播放/执行
         stop:        '\uf04d',  // 停止
         xmark:       '\uf00d',  // 删除/关闭
-        pen:         '\uf303',  // 编辑
+        pen:         '\uf044',  // 编辑（edit）
         arrowLeft:   '\uf060',  // 返回
         download:    '\uf019',  // 下载/导入
         upload:      '\uf093',  // 上传/导出
+        save:        '\uf0c7',  // 保存（磁盘）
         ellipsis:    '\uf141',  // 更多
         bars:        '\uf0c9',  // 菜单/列表
         code:        '\uf121',  // 代码/格式化
@@ -52,16 +53,34 @@ module.exports = {
         plus:        '\uf067',  // 添加
         clipboardList: '\uf46d', // 片段
         robot:       '\uf544',  // AI 机器人
-        comment:     '\uf075'   // 对话
+        comment:     '\uf075',  // 对话
+        eye:         '\uf06e',  // 眼睛（显示密码）
+        eyeSlash:    '\uf070',  // 眼睛划线（隐藏密码）
+        magic:       '\uf0d0',  // 魔法棒（格式化）
+        undo:        '\uf0e2',  // 撤销（重置）
+        cloud:       '\uf0c2',  // 云（任务中心）
+        arrowUp:     '\uf062',  // 向上箭头
+        arrowDown:   '\uf063',  // 向下箭头
+        circle:      '\uf111',  // 实心圆
+        circleO:     '\uf10c',  // 空心圆
+        check:       '\uf00c',  // 对勾
+        pause:       '\uf04c',  // 暂停
+        square:      '\uf0c8',  // 方块
+        cog:         '\uf013',  // 齿轮（设置）
+        spinner:     '\uf110',  // 加载中
+        clock:       '\uf017',  // 时钟
+        info:        '\uf129',  // 信息
+        calendar:    '\uf073',   // 日历
+        paperPlane:  '\uf1d8',  // 纸飞机（发送）
     },
 
     // 状态映射
     statusMap: {
-        idle:    { text: '待执行', color: '#F59E0B', dot: '●' },     // 警告橙色
-        running: { text: '执行中', color: '#1F6FEB', dot: '●' },     // 主蓝色
-        success: { text: '已完成', color: '#22C55E', dot: '●' },     // 成功绿色
-        failed:  { text: '失败',   color: '#EF4444', dot: '●' },     // 错误红色
-        paused:  { text: '已暂停', color: '#9C27B0', dot: '●' }      // 紫色
+        idle:    { text: '待执行', color: '#F59E0B', dot: '●' },
+        running: { text: '执行中', color: '#1F6FEB', dot: '●' },
+        success: { text: '已完成', color: '#22C55E', dot: '●' },
+        failed:  { text: '失败',   color: '#EF4444', dot: '●' },
+        paused:  { text: '已暂停', color: '#9C27B0', dot: '●' }
     },
     
     // 默认任务脚本

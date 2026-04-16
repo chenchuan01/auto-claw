@@ -44,8 +44,8 @@ UITaskDetail.prototype.show = function(taskId) {
         '        <text text="' + task.name + '" textSize="22sp" textColor="' + C.textPrimary + '" textStyle="bold"/>' +
         '        <text text="' + (task.description || '暂无描述') + '" textSize="14sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
         '        <horizontal marginTop="18" gravity="center_vertical">' +
-        '          <text id="task_status_badge" text="' + statusInfo.text + '" textSize="13sp" textColor="' + statusInfo.color + '" bg="' + statusInfo.color + '22" padding="6 14" cornerRadius="20" textStyle="bold"/>' +
-        '          <text text="执行 ' + (task.runCount || 0) + ' 次" textSize="13sp" textColor="' + C.textHint + '" layout_weight="1" gravity="right"/>' +
+        '          <text id="task_status_badge" text="' + statusInfo.text + '" textSize="13sp" textColor="white" bg="' + statusInfo.color + '" padding="6 14" cornerRadius="20" textStyle="bold"/>' +
+        '          <text id="task_run_count" text="' + I.play + ' 执行 ' + (task.runCount || 0) + ' 次" textSize="13sp" textColor="' + C.textHint + '" layout_weight="1" gravity="right"/>' +
         '        </horizontal>' +
         '      </vertical>' +
         '      <!-- 任务信息 -->' +
@@ -60,6 +60,10 @@ UITaskDetail.prototype.show = function(taskId) {
         '          <text text="' + mgr.formatTime(task.lastRunTime) + '" textSize="14sp" textColor="' + C.textPrimary + '"/>' +
         '        </horizontal>' +
         '        <horizontal padding="0 8" marginTop="12">' +
+        '          <text text="作者" textSize="14sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
+        '          <text id="task_author" text="' + (task.authorId === 'system' ? I.robot + ' ' : (task.authorId ? I.user + ' ' : '')) + (task.author || '系统') + '" textSize="14sp" textColor="' + C.textPrimary + '"/>' +
+        '        </horizontal>' +
+        '        <horizontal padding="0 8" marginTop="12">' +
         '          <text text="任务来源" textSize="14sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
         '          <text text="' + (task.source === 'market' ? '中心导入' : '本地创建') + '" textSize="14sp" textColor="' + C.textPrimary + '"/>' +
         '        </horizontal>' +
@@ -71,8 +75,7 @@ UITaskDetail.prototype.show = function(taskId) {
         '          <button id="btn_logs" text="' + I.bars + ' 查看日志" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="15sp" cornerRadius="16" h="48"/>' +
         '        </horizontal>' +
         '        <horizontal marginTop="12">' +
-        '          <button id="btn_export" text="' + I.upload + ' 导出脚本" layout_weight="1" marginRight="8" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="15sp" cornerRadius="16" h="48"/>' +
-        '          <button id="btn_delete" text="' + I.xmark + ' 删除任务" layout_weight="1" bg="' + C.error + '" textColor="#FFFFFF" textSize="15sp" cornerRadius="16" h="48"/>' +
+        '          <button id="btn_delete" text="' + I.xmark + ' 删除任务" layout_weight="1" bg="' + C.error + '" textColor="#FFFFFF" textSize="15sp" cornerRadius="16" h="48" marginTop="0"/>' +
         '        </horizontal>' +
         '      </vertical>' +
         '    </vertical>' +
@@ -95,7 +98,7 @@ UITaskDetail.prototype.show = function(taskId) {
     updateRunButton();
 
     // 应用 Font Awesome 字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_edit, ui.btn_run_now, ui.btn_logs, ui.btn_export, ui.btn_delete);
+    mgr.fontManager.apply(ui.btn_back, ui.btn_edit, ui.btn_run_now, ui.btn_logs, ui.btn_export, ui.btn_delete, ui.task_run_count, ui.task_author);
 
     // 轮询更新按钮状态
     self.pollInterval = setInterval(function() {
@@ -124,7 +127,6 @@ UITaskDetail.prototype.show = function(taskId) {
         setTimeout(updateRunButton, 300);
     });
     ui.btn_logs.on('click', function() { mgr.dialogs.showTaskLogs(taskId); });
-    ui.btn_export.on('click', function() { mgr.exportTaskScript(taskId); });
     ui.btn_delete.on('click', function() {
         self.stopPolling();
         mgr.dialogs.confirmDeleteTask(taskId);

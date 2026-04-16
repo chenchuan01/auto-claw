@@ -25,11 +25,13 @@ TaskExecutor.prototype.executeTask = function(taskId) {
     });
 
     this.taskLogs[taskId] = [];
-    this.addTaskLog(taskId, '▶ 开始执行任务: ' + task.name);
-    this.addTaskLog(taskId, '⏱ 开始时间: ' + new Date().toLocaleString());
+    this.addTaskLog(taskId, '[START] 开始执行任务: ' + task.name);
+    this.addTaskLog(taskId, '[TIME] 开始时间: ' + new Date().toLocaleString());
 
     try {
-        var execution = engines.execScript(task.name, task.script);
+        var execution = engines.execScript(task.name, task.script, {
+            engineType: 'rhino'
+        });
         var engine = execution.getEngine();
         this.runningTasks[taskId] = engine;
 
@@ -41,9 +43,9 @@ TaskExecutor.prototype.executeTask = function(taskId) {
                 var currentTask = self.dataManager.getTaskById(taskId);
                 if (currentTask && currentTask.status === 'running') {
                     self.dataManager.updateTask(taskId, { status: 'success' });
-                    self.addTaskLog(taskId, '✓ 任务执行完成');
+                    self.addTaskLog(taskId, '[OK] 任务执行完成');
                 }
-                self.addTaskLog(taskId, '▪ 任务执行结束: ' + new Date().toLocaleString());
+                self.addTaskLog(taskId, '[END] 任务执行结束: ' + new Date().toLocaleString());
             }
         });
 

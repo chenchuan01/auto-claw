@@ -19,9 +19,9 @@ UISettings.prototype.show = function() {
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
         '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
-        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="26sp" textColor="#FFFFFF" padding="4 4 12 4"/>' +
+        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="24sp" textColor="#FFFFFF" padding="4 4 12 4"/>' +
         '    <text text="AI 设置" textSize="22sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
-        '    <text id="btn_save" text="✓" textSize="24sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
+        '    <text id="btn_save" text="' + I.save + '" textSize="22sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
         '  </horizontal>' +
         '  <!-- 内容区域 -->' +
         '  <scroll bg="' + C.bg + '">' +
@@ -34,7 +34,7 @@ UISettings.prototype.show = function() {
         '        <input id="input_api_url" hint="https://api.openai.com/v1" text="' + aiConfig.apiUrl + '" textSize="14sp" textColor="' + C.textPrimary + '" bg="' + C.surface + '" padding="12" cornerRadius="12" singleLine="true"/>' +
         '        ' +
         '        <text text="API Key" textSize="14sp" textColor="' + C.textSecondary + '" marginTop="16" marginBottom="8"/>' +
-        '        <input id="input_api_key" hint="sk-..." text="' + aiConfig.apiKey + '" textSize="14sp" textColor="' + C.textPrimary + '" bg="' + C.surface + '" padding="12" cornerRadius="12" singleLine="true" inputType="textPassword"/>' +
+        '        <input id="input_api_key" hint="sk-..." text="' + aiConfig.apiKey + '" textSize="14sp" textColor="' + C.textPrimary + '" bg="' + C.surface + '" padding="12" cornerRadius="12" singleLine="true" password="true"/>' +
         '        ' +
         '        <text text="模型名称" textSize="14sp" textColor="' + C.textSecondary + '" marginTop="16" marginBottom="8"/>' +
         '        <input id="input_model" hint="gpt-3.5-turbo" text="' + aiConfig.model + '" textSize="14sp" textColor="' + C.textPrimary + '" bg="' + C.surface + '" padding="12" cornerRadius="12" singleLine="true"/>' +
@@ -63,21 +63,27 @@ UISettings.prototype.show = function() {
         '      ' +
         '      <!-- 说明 -->' +
         '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
-        '        <text text="' + I.bars + ' 使用说明" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
+        '        <text text="' + I.bars + ' 使用说明" textSize="14sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
         '        <text text="1. 配置 API URL 和 Key 后即可使用 AI 对话功能" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
-        '        <text text="2. OpenAI 格式 URL 示例: https://api.openai.com/v1" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
-        '        <text text="3. Anthropic 格式 URL 示例: https://api.anthropic.com/v1" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
-        '        <text text="4. AI 助手已集成 AutoX.js v6 开发知识" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
+        '        <text text="2. OpenAI 格式填 base URL，自动拼接 /chat/completions" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
+        '        <text text="3. Anthropic 格式填 base URL，自动拼接 /v1/messages" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
         '      </vertical>' +
         '    </vertical>' +
         '  </scroll>' +
+        mgr.buildBottomNav('tasks') +
         '</vertical>'
     );
 
     var selectedFormat = aiConfig.messageFormat;
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back);
+    mgr.fontManager.apply(ui.btn_back, ui.btn_save);
+    mgr.bindBottomNav();
+
+    // 强制设置 API Key 为密码模式
+    ui.input_api_key.setInputType(
+        android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+    );
 
     ui.btn_back.on('click', function() {
         mgr.showMainView();

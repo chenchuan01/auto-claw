@@ -36,19 +36,21 @@ FontManager.prototype.apply = function() {
     if (!this.typeface) return;
 
     var tf = this.typeface;
-    var views = Array.prototype.slice.call(arguments);
 
-    views.forEach(function(view) {
-        if (view) {
-            ui.run(function() {
-                try {
-                    view.setTypeface(tf);
-                } catch (e) {
-                    console.error('[FontManager] 应用字体失败: ' + e);
-                }
-            });
-        }
-    });
+    // 使用传统方式处理 arguments（兼容 Rhino 引擎）
+    for (var i = 0; i < arguments.length; i++) {
+        (function(view) {
+            if (view) {
+                ui.run(function() {
+                    try {
+                        view.setTypeface(tf);
+                    } catch (e) {
+                        console.error('[FontManager] 应用字体失败: ' + e);
+                    }
+                });
+            }
+        })(arguments[i]);
+    }
 };
 
 /**
