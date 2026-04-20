@@ -3,7 +3,7 @@
  * 显示完整任务日志，支持复制
  */
 
-var Config = require('./config');
+var Config = require('../core/config');
 var C = Config.colors;
 var I = Config.icons;
 

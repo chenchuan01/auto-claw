@@ -15,13 +15,13 @@ module.exports = {
 
     // 颜色配置（清新浅色主题 + 现代化设计）
     colors: {
-        primary:       '#1F6FEB',  // 主蓝色
-        primaryDark:   '#1558C0',  // 深蓝色
-        accent:        '#1F6FEB',  // 强调蓝色
+        primary:       '#3B82F6',  // 主浅蓝色
+        primaryDark:   '#2563EB',  // 深蓝色
+        accent:        '#3B82F6',  // 强调浅蓝色
         success:       '#22C55E',  // 成功绿色
         warning:       '#F59E0B',  // 警告橙色
         error:         '#EF4444',  // 错误红色
-        info:          '#1F6FEB',  // 信息蓝色
+        info:          '#3B82F6',  // 信息浅蓝色
         bg:            '#FFFFFF',  // 背景白色
         card:          '#F5F7FA',  // 卡片背景浅灰
         surface:       '#EEF1F6',  // 表面元素更浅灰

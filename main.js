@@ -5,6 +5,9 @@
 
 "ui";
 
+// 设置沉浸式状态栏
+ui.statusBarColor("#1F6FEB");
+
 // 显示启动界面
 ui.layout(
     '<vertical gravity="center" w="*" h="*" bg="#FFFFFF">' +
@@ -21,11 +24,11 @@ ui.layout(
 setTimeout(function() {
     try {
         // 导入模块
-        var Config = require('./modules/config');
-        var DataManager = require('./modules/data_manager');
-        var TaskExecutor = require('./modules/task_executor');
-        var MarketService = require('./modules/market_service');
-        var UIManager = require('./modules/ui_manager');
+        var Config = require('./modules/core/config');
+        var DataManager = require('./modules/services/data_manager');
+        var TaskExecutor = require('./modules/services/task_executor');
+        var MarketService = require('./modules/services/market_service');
+        var UIManager = require('./modules/ui/ui_manager');
 
         // 初始化管理器
         var dataManager = new DataManager();
@@ -36,10 +39,7 @@ setTimeout(function() {
         // 显示主界面
         uiManager.showMainView();
 
-        // 显示欢迎消息
-        setTimeout(function() {
-            toast('欢迎使用 ' + Config.appName + ' v' + Config.version);
-        }, 500);
+        // 显示欢迎消息已移除
 
     } catch (error) {
         console.error('应用启动失败:', error);
@@ -75,11 +75,11 @@ setTimeout(function() {
 // 检查模块文件
 function checkModules() {
     var modules = [
-        './modules/config.js',
-        './modules/data_manager.js',
-        './modules/task_executor.js',
-        './modules/market_service.js',
-        './modules/ui_manager_complete.js'
+        './modules/core/config.js',
+        './modules/services/data_manager.js',
+        './modules/services/task_executor.js',
+        './modules/services/market_service.js',
+        './modules/ui/ui_manager.js'
     ];
 
     var missingModules = [];

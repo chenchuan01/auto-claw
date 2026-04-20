@@ -3,7 +3,7 @@
  * 负责任务的增删改查和持久化
  */
 
-var Config = require('./config');
+var Config = require('../core/config');
 
 function DataManager() {
     this.storage = storages.create(Config.storageName);

@@ -2,7 +2,7 @@
  * UI主界面模块
  */
 
-var Config = require('./config');
+var Config = require('../core/config');
 var C = Config.colors;
 var I = Config.icons;
 
@@ -25,7 +25,8 @@ UIMainView.prototype.show = function() {
         '  <!-- 任务列表区域 -->' +
         '  <frame layout_weight="1">' +
         '    <list id="task_list" bg="' + C.bg + '">' +
-        '      <vertical margin="12 12 12 12" bg="' + C.card + '" cornerRadius="16" padding="16" w="*">' +
+        '      <frame margin="12 12 12 12" bg="' + C.card + '" cornerRadius="32" w="*">' +
+        '        <vertical padding="16">' +
         '        <!-- 第一行：任务名称 + 状态标签 -->' +
         '        <horizontal gravity="center_vertical">' +
         '          <text id="task_name" text="{{this.name}}" textSize="19sp" textColor="' + C.textPrimary + '" textStyle="bold" layout_weight="1"/>' +
@@ -35,15 +36,16 @@ UIMainView.prototype.show = function() {
         '        <text id="task_desc" text="{{this.description}}" textSize="13sp" textColor="' + C.textSecondary + '" maxLines="1" marginTop="6"/>' +
         '        <!-- 第三行：次要信息 -->' +
         '        <horizontal gravity="center_vertical" marginTop="10">' +
-        '          <text text="⏱ {{this.lastRunTimeText}}" textSize="11sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
-        '          <text text="🔁 {{this.runCount}} 次" textSize="11sp" textColor="' + C.textHint + '"/>' +
+        '          <text text="' + I.clock + ' {{this.lastRunTimeText}}" textSize="11sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
+        '          <text text="' + I.refresh + ' {{this.runCount}} 次" textSize="11sp" textColor="' + C.textHint + '"/>' +
         '        </horizontal>' +
         '        <!-- 操作按钮 -->' +
         '        <horizontal marginTop="12">' +
-        '          <button id="btn_run" text="' + I.play + ' 执行" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="12" h="42" textStyle="bold"/>' +
-        '          <button id="btn_manage" text="' + I.ellipsis + ' 管理" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="12" h="42"/>' +
+        '          <button id="btn_run" text="' + I.play + ' 执行" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="24" h="42" textStyle="bold"/>' +
+        '          <button id="btn_manage" text="' + I.ellipsis + ' 管理" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="24" h="42"/>' +
         '        </horizontal>' +
-        '      </vertical>' +
+        '        </vertical>' +
+        '      </frame>' +
         '    </list>' +
         '    <!-- 空状态 -->' +
         '    <vertical id="empty_view" visibility="gone" gravity="center" bg="' + C.bg + '" padding="40">' +
@@ -187,8 +189,8 @@ UIMainView.prototype.bindEvents = function() {
             statusDot.attr('alpha', '1.0');
         }
 
-        // 应用 Font Awesome 字体到列表项按钮
-        mgr.fontManager.apply(itemView.btn_run, itemView.btn_manage);
+        // 应用 Font Awesome 字体到图标
+        mgr.fontManager.apply(itemView.btn_run, itemView.btn_manage, itemView.status_dot);
 
         itemView.btn_run.on('click', function() {
             if (itemHolder && itemHolder.item) {

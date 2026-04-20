@@ -36,8 +36,12 @@
     "hideLogs": false,
     "stableMode": true,
     "volumeUpcontrol": false,
-    "permissions": [],
-    "serviceDesc": "使脚本自动操作(点击、长按、滑动等)所需",
+    "permissions": [
+      "accessibility_services",
+      "background_start",
+      "draw_overlay"
+    ],
+    "serviceDesc": "解放生产力",
     "splashIcon": "res/splashIcon.png",
     "splashText": "Powered by yyfun"
   },
@@ -61,7 +65,7 @@
   "main": "main.js",
   "name": "AutoClaw",
   "outputPath": "/storage/emulated/0/Scripts/AutoClaw/build",
-  "packageName": "com.autoclaw.app",
+  "packageName": "com.iyunya.autoclaw",
   "projectDirectory": "/storage/emulated/0/Scripts/AutoClaw",
   "scripts": {},
   "signingConfig": {

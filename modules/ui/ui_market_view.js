@@ -2,7 +2,7 @@
  * UI任务中心模块
  */
 
-var Config = require('./config');
+var Config = require('../core/config');
 var C = Config.colors;
 var I = Config.icons;
 
@@ -28,7 +28,10 @@ UIMarketView.prototype.show = function() {
         '      <horizontal gravity="center_vertical">' +
         '        <vertical layout_weight="1">' +
         '          <text id="market_name" text="{{name}}" textSize="17sp" textColor="' + C.textPrimary + '" textStyle="bold"/>' +
-        '        <text id="market_author" text="{{authorIcon}} {{author}}" textSize="12sp" textColor="' + C.textHint + '" marginTop="4"/>' +
+        '          <horizontal id="market_author_row" gravity="center_vertical" marginTop="4">' +
+        '            <text id="market_author_icon" text="{{authorIcon}}" textSize="12sp" textColor="' + C.textHint + '" marginRight="4"/>' +
+        '            <text id="market_author_name" text="{{author}}" textSize="12sp" textColor="' + C.textHint + '"/>' +
+        '          </horizontal>' +
         '        </vertical>' +
         '        <button id="btn_import" text="' + I.download + ' 导入" bg="' + C.primary + '" textColor="white" textSize="13sp" cornerRadius="14" h="36" w="68" marginLeft="8" textStyle="bold"/>' +
         '      </horizontal>' +
@@ -49,7 +52,10 @@ UIMarketView.prototype.show = function() {
     ui.btn_refresh.on('click', function() { self.loadData(); });
     ui.market_list.on('item_click', function(item) { self.showDetail(item); });
     ui.market_list.on('item_bind', function(itemView, itemHolder) {
-        mgr.fontManager.apply(itemView.btn_import, itemView.market_author, itemView.market_downloads, itemView.market_rating);
+        // 确保应用字体到图标
+        if (mgr.fontManager && mgr.fontManager.isLoaded()) {
+            mgr.fontManager.apply(itemView.btn_import, itemView.market_author_icon, itemView.market_downloads, itemView.market_rating);
+        }
         itemView.btn_import.on('click', function() { mgr.dialogs.importMarketTask(itemHolder.item); });
     });
     mgr.bindBottomNav();
@@ -83,6 +89,13 @@ UIMarketView.prototype.showDetail = function(marketTask) {
     var self = this;
     var mgr = this.uiManager;
 
+    // 代码默认展开
+    var codeExpanded = true;
+
+    // 预处理脚本代码，转义单引号
+    var scriptText = marketTask.script || '暂无脚本';
+    scriptText = scriptText.replace(/\\/g, '\\\\').replace(/'/g, '\\\'');
+
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
@@ -107,6 +120,16 @@ UIMarketView.prototype.showDetail = function(marketTask) {
         '        <text text="任务简介" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
         '        <text text="' + marketTask.description + '" textSize="14sp" textColor="' + C.textPrimary + '"/>' +
         '      </vertical>' +
+        '      <!-- 脚本代码预览 -->' +
+        '      <vertical id="code_card" bg="' + C.card + '" cornerRadius="20" padding="16" marginTop="16">' +
+        '        <horizontal id="code_header" gravity="center_vertical">' +
+        '          <text text="' + I.code + ' 任务脚本" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" layout_weight="1"/>' +
+        '          <text id="code_toggle" text="' + I.arrowUp + '" textSize="20sp" textColor="' + C.textHint + '"/>' +
+        '        </horizontal>' +
+        '        <vertical id="code_content" visibility="visible" marginTop="12">' +
+        '          <text id="code_text" text="' + scriptText + '" textSize="12sp" textColor="' + C.textPrimary + '" fontFamily="monospace" lineSpacingExtra="3"/>' +
+        '        </vertical>' +
+        '      </vertical>' +
         '      <!-- 导入按钮 -->' +
         '      <button id="btn_import_task" text="' + I.download + ' 导入任务" bg="' + C.primary + '" textColor="white" textSize="15sp" cornerRadius="16" h="52" marginTop="24" textStyle="bold"/>' +
         '    </vertical>' +
@@ -116,8 +139,22 @@ UIMarketView.prototype.showDetail = function(marketTask) {
 
     ui.btn_back2.on('click', function() { self.show(); });
     ui.btn_import_task.on('click', function() { mgr.dialogs.importMarketTask(marketTask); });
+
+    // 代码展开/折叠切换
+    ui.code_header.on('click', function() {
+        codeExpanded = !codeExpanded;
+        if (codeExpanded) {
+            ui.code_content.attr('visibility', 'visible');
+            ui.code_toggle.setText(I.arrowUp);
+        } else {
+            ui.code_content.attr('visibility', 'gone');
+            ui.code_toggle.setText(I.arrowDown);
+        }
+        mgr.fontManager.apply(ui.code_toggle);
+    });
+
     // 为作者、下载数和星级图标应用字体
-    mgr.fontManager.apply(ui.btn_back2, ui.btn_import_task, ui.detail_author, ui.detail_downloads, ui.detail_rating);
+    mgr.fontManager.apply(ui.btn_back2, ui.btn_import_task, ui.detail_author, ui.detail_downloads, ui.detail_rating, ui.code_header, ui.code_toggle);
 };
 
 module.exports = UIMarketView;

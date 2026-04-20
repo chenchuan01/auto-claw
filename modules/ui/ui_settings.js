@@ -2,7 +2,7 @@
  * UI设置页面模块
  */
 
-var Config = require('./config');
+var Config = require('../core/config');
 var C = Config.colors;
 var I = Config.icons;
 

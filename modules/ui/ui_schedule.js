@@ -2,7 +2,7 @@
  * 定时任务设置界面
  */
 
-var Config = require('./config');
+var Config = require('../core/config');
 var C = Config.colors;
 var I = Config.icons;
 

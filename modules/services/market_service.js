@@ -3,7 +3,7 @@
  * 负责与任务市场交互
  */
 
-var Config = require('./config');
+var Config = require('../core/config');
 
 function MarketService() {
     this.baseUrl = Config.marketApi.baseUrl;

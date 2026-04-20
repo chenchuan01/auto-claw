@@ -3,7 +3,7 @@
  * 负责任务的执行、停止和状态管理
  */
 
-var Config = require('./config');
+var Config = require('../core/config');
 
 function TaskExecutor(dataManager) {
     this.dataManager = dataManager;

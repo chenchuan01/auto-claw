@@ -3,7 +3,7 @@
  * 整合所有UI子模块
  */
 
-var Config = require('./config');
+var Config = require('../core/config');
 var C = Config.colors;
 var I = Config.icons;
 var UIMainView = require('./ui_main_view');
@@ -15,9 +15,9 @@ var UIScriptEditor = require('./ui_script_editor');
 var UISettings = require('./ui_settings');
 var UIAIChat = require('./ui_ai_chat');
 var UISchedule = require('./ui_schedule');
-var FontManager = require('./font_manager');
-var AIService = require('./ai_service');
-var Scheduler = require('./scheduler');
+var FontManager = require('../core/font_manager');
+var AIService = require('../ai/ai_service');
+var Scheduler = require('../services/scheduler');
 
 function UIManager(dataManager, taskExecutor, marketService, recorder) {
     this.dataManager = dataManager;
@@ -166,7 +166,7 @@ UIManager.prototype.setupBackHandler = function() {
 UIManager.prototype.buildBottomNav = function(activeTab) {
     var tasksColor = activeTab === 'tasks' ? C.primary : C.textHint;
     var marketColor = activeTab === 'market' ? C.primary : C.textHint;
-    return '  <horizontal bg="' + C.card + '" padding="8 0" cornerRadius="24 24 0 0">' +
+    return '  <horizontal bg="' + C.card + '" padding="8 0" cornerRadius="40 40 0 0">' +
         '    <vertical id="nav_btn_tasks" layout_weight="1" gravity="center" padding="12 8">' +
         '      <text id="nav_icon_tasks" text="' + I.bars + '" textSize="20sp" textColor="' + tasksColor + '" gravity="center"/>' +
         '      <text text="任务列表" textSize="10sp" textColor="' + tasksColor + '" gravity="center" marginTop="4"/>' +

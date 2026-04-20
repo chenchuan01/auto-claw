@@ -2,7 +2,7 @@
  * UI对话框模块
  */
 
-var Config = require('./config');
+var Config = require('../core/config');
 
 function UIDialogs(uiManager) {
     this.uiManager = uiManager;
