@@ -88,6 +88,10 @@ function startCoordinatePicker(self, callback) {
                     ui.run(function() {
                         self.pickCallback(centerX, centerY);
                         stopCoordinatePicker(self, window);
+                        // 拾取完成后，切回AutoClaw应用
+                        setTimeout(function() {
+                            app.launchPackage(context.getPackageName());
+                        }, 100);
                     });
                 }
                 return true;
