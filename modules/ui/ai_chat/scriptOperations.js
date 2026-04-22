@@ -80,13 +80,17 @@ function runScript(self) {
         if (success) {
             // 显示查看日志按钮
             ui.post(function() {
-                ui.btn_view_logs.attr('visibility', 'visible');
+                if (ui.btn_view_logs) {
+                    ui.btn_view_logs.attr('visibility', 'visible');
+                }
             });
             toast('脚本已开始运行，运行完成后可点击查看日志');
         } else {
             // 执行失败也要显示日志按钮查看错误
             ui.post(function() {
-                ui.btn_view_logs.attr('visibility', 'visible');
+                if (ui.btn_view_logs) {
+                    ui.btn_view_logs.attr('visibility', 'visible');
+                }
             });
         }
     });

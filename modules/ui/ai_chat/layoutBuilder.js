@@ -67,8 +67,9 @@ function buildLayout(title) {
         '      </horizontal>' +
         '      <!-- 底部按钮 -->' +
         '      <horizontal marginTop="12">' +
-        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.primary + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="6" textStyle="bold"/>' +
-        '        <button id="btn_save_task" text="' + I.save + ' 保存任务" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="6" textStyle="bold"/>' +
+        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.primary + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="4" textStyle="bold"/>' +
+        '        <button id="btn_view_logs" text="' + I.list + ' 日志" bg="' + C.info + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" marginRight="4" visibility="gone"/>' +
+        '        <button id="btn_save_task" text="' + I.save + ' 保存任务" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" textStyle="bold"/>' +
         '      </horizontal>' +
         '    </vertical>' +
         '  </frame>' +
