@@ -22,36 +22,31 @@ function startCoordinatePicker(self, callback) {
 
     // 在新线程创建悬浮窗
     threads.start(function() {
-        // 全屏透明背景，不拦截触摸，只有十字准星可拖动
+        // 悬浮窗只有准星本身大小，不覆盖整个屏幕
+        // 这样屏幕其他区域完全不受悬浮窗影响，自然可以自由操作
+        var startX = Math.floor((device.width - 48) / 2);
+        var startY = Math.floor((device.height - 48) / 2);
+
         var window = floaty.window(
-            '<frame id="root" bg="#00000000" w="' + device.width + 'px" h="' + device.height + 'px">' +
-            '  <frame id="crosshair" w="wrap_content" h="wrap_content" ' +
-            '    layout_marginLeft="' + Math.floor((device.width - 48) / 2) + 'px" ' +
-            '    layout_marginTop="' + Math.floor((device.height - 48) / 2) + 'px">' +
-            '    <frame w="48" h="48" gravity="center">' +
-            '      <!-- 半透明背景，只显示十字 -->' +
-            '      <text text="" w="48" h="48" bg="#00000088" gravity="center" cornerRadius="24"/>' +
-            '      <text text="" bg="#FF0000" h="2" w="38" gravity="center"/>' +
-            '      <text text="" bg="#FF0000" w="2" h="38" gravity="center"/>' +
-            '    </frame>' +
+            '<frame id="root" w="48" h="48" bg="#00000000">' +
+            '  <frame w="48" h="48" gravity="center">' +
+            '    <text text="" w="48" h="48" bg="#00000088" gravity="center" cornerRadius="24"/>' +
+            '    <text text="" bg="#FF0000" h="2" w="38" gravity="center"/>' +
+            '    <text text="" bg="#FF0000" w="2" h="38" gravity="center"/>' +
             '  </frame>' +
             '</frame>'
         );
 
-        // 在 AutoX.js 中，XML id 直接作为 window 的属性
         var root = window.root;
-        var crosshair = window.crosshair;
-
-        // 记录准星当前位置
-        var currentX = Math.floor((device.width - 48) / 2);
-        var currentY = Math.floor((device.height - 48) / 2);
+        var currentX = startX;
+        var currentY = startY;
         var lastRawX = 0;
         var lastRawY = 0;
 
-        console.log('[coord-picker] init currentX=' + currentX + ' currentY=' + currentY + ' screen=' + device.width + 'x' + device.height);
+        console.log('[coord-picker] init at ' + currentX + ',' + currentY + ' screen=' + device.width + 'x' + device.height);
 
-        // 只让十字准星响应触摸，背景完全不拦截
-        crosshair.setOnTouchListener(function(view, event) {
+        // 准星本身响应触摸拖动
+        root.setOnTouchListener(function(view, event) {
             var action = event.getAction();
             var rawX = event.getRawX();
             var rawY = event.getRawY();
@@ -67,27 +62,22 @@ function startCoordinatePicker(self, callback) {
                 if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
                     self.dragging = true;
                 }
-                // 更新准星位置
+                // 更新窗口位置
                 currentX += dx;
                 currentY += dy;
                 // 限制在屏幕范围内
                 currentX = Math.max(0, Math.min(currentX, device.width - 48));
                 currentY = Math.max(0, Math.min(currentY, device.height - 48));
-                // 设置margin来移动准星
-                var lp = crosshair.getLayoutParams();
-                lp.leftMargin = currentX;
-                lp.topMargin = currentY;
-                crosshair.setLayoutParams(lp);
+                window.setPosition(currentX, currentY);
                 lastRawX = rawX;
                 lastRawY = rawY;
                 return true;
             } else if (action == android.view.MotionEvent.ACTION_UP) {
                 if (!self.dragging) {
-                    // 点击拾取：计算中心点坐标
+                    // 点击准星完成拾取
                     var centerX = currentX + 24; // 24 = 48/2
                     var centerY = currentY + 24;
                     console.log('[coord-picker] PICK at ' + centerX + ',' + centerY);
-                    // 调用回调
                     ui.run(function() {
                         self.pickCallback(centerX, centerY);
                         stopCoordinatePicker(self, window);
@@ -98,21 +88,13 @@ function startCoordinatePicker(self, callback) {
             return false;
         });
 
-        // 根布局：任何触摸都返回false，让所有事件穿透到底层应用
-        root.setOnTouchListener(function(view, event) {
-            // 返回false → 不消费此事件，继续向下传递给下层应用
-            // 这样下层应用可以正常响应滑动、点击等操作
-            return false;
-        });
-
-        // 关键设置：允许触摸穿透
-        // 窗口本身可触摸（准星需要响应），但不拦截非准星区域事件
+        // 关键设置：
+        // 窗口只在准星大小，不覆盖全屏
+        // 其他区域本来就不在悬浮窗上，自然能接收触摸
         window.setTouchable(true);
         window.setFocusable(false);
-        window.setInterceptTouchEvent(false);
-        // 窗口固定位置
-        window.setPosition(0, 0);
-        // 使用WindowManager标志确保不抢焦点
+        window.setPosition(startX, startY);
+        // 确保不抢焦点
         var attrs = window.getWindow().getAttributes();
         attrs.flags |= android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         attrs.flags |= android.view.WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
