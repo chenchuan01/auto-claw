@@ -29,10 +29,10 @@ function startCoordinatePicker(self, callback) {
             '    layout_marginLeft="' + Math.floor((device.width - 48) / 2) + 'px" ' +
             '    layout_marginTop="' + Math.floor((device.height - 48) / 2) + 'px">' +
             '    <frame w="48" h="48" gravity="center">' +
-            '      <!-- 透明背景，只显示十字 -->' +
+            '      <!-- 半透明背景，只显示十字 -->' +
             '      <text text="" w="48" h="48" bg="#00000088" gravity="center" cornerRadius="24"/>' +
-            '      <text text="" bg="#3B82F6" h="2" w="38" gravity="center"/>' +
-            '      <text text="" bg="#3B82F6" w="2" h="38" gravity="center"/>' +
+            '      <text text="" bg="#FF0000" h="2" w="38" gravity="center"/>' +
+            '      <text text="" bg="#FF0000" w="2" h="38" gravity="center"/>' +
             '    </frame>' +
             '  </frame>' +
             '</frame>'
@@ -98,24 +98,25 @@ function startCoordinatePicker(self, callback) {
             return false;
         });
 
-        // 根布局：非准星区域触摸返回false，让事件穿透到底层
+        // 根布局：任何触摸都返回false，让所有事件穿透到底层应用
         root.setOnTouchListener(function(view, event) {
-            // 返回false表示不消费此事件，让它传递给下层应用
+            // 返回false → 不消费此事件，继续向下传递给下层应用
+            // 这样下层应用可以正常响应滑动、点击等操作
             return false;
         });
 
-        // 关键设置：
-        // 1. 窗口可触摸，但只在准星区域拦截
-        // 2. 允许穿透，让下面的应用接收触摸事件
+        // 关键设置：允许触摸穿透
+        // 窗口本身可触摸（准星需要响应），但不拦截非准星区域事件
         window.setTouchable(true);
         window.setFocusable(false);
         window.setInterceptTouchEvent(false);
-        // 窗口固定位置，不移动
+        // 窗口固定位置
         window.setPosition(0, 0);
-        // 添加穿透标志
-        var lp = window.getWindow().getAttributes();
-        lp.flags |= android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        window.getWindow().setAttributes(lp);
+        // 使用WindowManager标志确保不抢焦点
+        var attrs = window.getWindow().getAttributes();
+        attrs.flags |= android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        attrs.flags |= android.view.WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
+        window.getWindow().setAttributes(attrs);
         self.coordinatePickerWindow = window;
 
         ui.run(function() {
