@@ -82,9 +82,16 @@ function startCoordinatePicker(self, callback) {
             } else if (action == android.view.MotionEvent.ACTION_UP) {
                 if (!self.dragging) {
                     // 点击准星完成拾取
+                    // 加上状态栏高度补偿：floaty window的y坐标不包含状态栏
+                    // 所以实际物理坐标需要加上状态栏高度才能匹配click()绝对坐标
+                    var resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+                    var statusBarHeight = 0;
+                    if (resourceId > 0) {
+                        statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
+                    }
                     var centerX = currentX + 24; // 24 = 48/2
-                    var centerY = currentY + 24;
-                    console.log('[coord-picker] PICK at ' + centerX + ',' + centerY);
+                    var centerY = currentY + 24 + statusBarHeight;
+                    console.log('[coord-picker] PICK at ' + centerX + ',' + centerY + ' statusBarHeight=' + statusBarHeight);
                     ui.run(function() {
                         self.pickCallback(centerX, centerY);
                         stopCoordinatePicker(self, window);
