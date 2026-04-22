@@ -26,13 +26,13 @@ function startCoordinatePicker(self, callback) {
         var window = floaty.window(
             '<frame id="root" bg="#00000000" w="' + device.width + 'px" h="' + device.height + 'px">' +
             '  <frame id="crosshair" w="wrap_content" h="wrap_content" ' +
-            '    layout_marginLeft="' + Math.floor((device.width - 64) / 2) + 'px" ' +
-            '    layout_marginTop="' + Math.floor((device.height - 64) / 2) + 'px">' +
-            '    <frame w="64" h="64" gravity="center">' +
+            '    layout_marginLeft="' + Math.floor((device.width - 48) / 2) + 'px" ' +
+            '    layout_marginTop="' + Math.floor((device.height - 48) / 2) + 'px">' +
+            '    <frame w="48" h="48" gravity="center">' +
             '      <!-- 透明背景，只显示十字 -->' +
-            '      <text text="" w="64" h="64" bg="#00000088" gravity="center" cornerRadius="32"/>' +
-            '      <text text="" bg="#FF0000" h="2" w="50" gravity="center"/>' +
-            '      <text text="" bg="#FF0000" w="2" h="50" gravity="center"/>' +
+            '      <text text="" w="48" h="48" bg="#00000088" gravity="center" cornerRadius="24"/>' +
+            '      <text text="" bg="#3B82F6" h="2" w="38" gravity="center"/>' +
+            '      <text text="" bg="#3B82F6" w="2" h="38" gravity="center"/>' +
             '    </frame>' +
             '  </frame>' +
             '</frame>'
@@ -43,8 +43,8 @@ function startCoordinatePicker(self, callback) {
         var crosshair = window.crosshair;
 
         // 记录准星当前位置
-        var currentX = Math.floor((device.width - 64) / 2);
-        var currentY = Math.floor((device.height - 64) / 2);
+        var currentX = Math.floor((device.width - 48) / 2);
+        var currentY = Math.floor((device.height - 48) / 2);
         var lastRawX = 0;
         var lastRawY = 0;
 
@@ -71,8 +71,8 @@ function startCoordinatePicker(self, callback) {
                 currentX += dx;
                 currentY += dy;
                 // 限制在屏幕范围内
-                currentX = Math.max(0, Math.min(currentX, device.width - 64));
-                currentY = Math.max(0, Math.min(currentY, device.height - 64));
+                currentX = Math.max(0, Math.min(currentX, device.width - 48));
+                currentY = Math.max(0, Math.min(currentY, device.height - 48));
                 // 设置margin来移动准星
                 var lp = crosshair.getLayoutParams();
                 lp.leftMargin = currentX;
@@ -84,8 +84,8 @@ function startCoordinatePicker(self, callback) {
             } else if (action == android.view.MotionEvent.ACTION_UP) {
                 if (!self.dragging) {
                     // 点击拾取：计算中心点坐标
-                    var centerX = currentX + 32; // 32 = 64/2
-                    var centerY = currentY + 32;
+                    var centerX = currentX + 24; // 24 = 48/2
+                    var centerY = currentY + 24;
                     console.log('[coord-picker] PICK at ' + centerX + ',' + centerY);
                     // 调用回调
                     ui.run(function() {
