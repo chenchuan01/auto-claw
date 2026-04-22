@@ -46,7 +46,7 @@ UIAIChat.prototype.show = function() {
     layoutBuilder.bindEvents(self, mgr);
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_quick_pick, ui.btn_send);
+    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
 
     // 显示欢迎消息
     if (self.messages.length === 0) {
@@ -67,28 +67,30 @@ UIAIChat.prototype.switchTab = function(tab) {
         ui.view_chat.attr('visibility', 'visible');
         ui.view_script.attr('visibility', 'gone');
         ui.input_area.attr('visibility', 'visible');
+        ui.quick_bar.attr('visibility', 'visible');
 
-        ui.tab_chat.attr('bg', C.primary + '22');
-        ui.tab_chat_text.attr('textColor', C.primary);
+        ui.tab_chat.attr('bg', C.primary);
+        ui.tab_chat_text.attr('textColor', 'white');
         ui.tab_chat_text.attr('textStyle', 'bold');
 
-        ui.tab_script.attr('bg', '#00000000');
+        ui.tab_script.attr('bg', C.surface);
         ui.tab_script_text.attr('textColor', C.textSecondary);
         ui.tab_script_text.attr('textStyle', 'normal');
     } else {
         ui.view_chat.attr('visibility', 'gone');
         ui.view_script.attr('visibility', 'visible');
         ui.input_area.attr('visibility', 'gone');
+        ui.quick_bar.attr('visibility', 'gone');
 
-        ui.tab_chat.attr('bg', '#00000000');
+        ui.tab_chat.attr('bg', C.surface);
         ui.tab_chat_text.attr('textColor', C.textSecondary);
         ui.tab_chat_text.attr('textStyle', 'normal');
 
-        ui.tab_script.attr('bg', C.primary + '22');
-        ui.tab_script_text.attr('textColor', C.primary);
+        ui.tab_script.attr('bg', C.primary);
+        ui.tab_script_text.attr('textColor', 'white');
         ui.tab_script_text.attr('textStyle', 'bold');
 
-        scriptOperations.updateScriptPreview(self);
+        scriptOperations.updateScriptPreview(this);
     }
 };
 
@@ -193,13 +195,13 @@ UIAIChat.prototype.showWithScript = function(script, taskName, currentTaskId) {
     }
 
     this.messages = [];
-    this.currentTab = 'chat';
+    this.currentTab = 'script';  // 默认显示脚本tab
 
     layoutBuilder.buildLayoutWithEdit(taskName);
     layoutBuilder.bindEventsWithEdit(self, mgr);
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_quick_pick, ui.btn_send);
+    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
 
     // 添加初始提示消息，包含要编辑的脚本
     var prompt = '请帮我优化/修改这个脚本：\n\n```javascript\n' + script + '\n```';
@@ -209,6 +211,20 @@ UIAIChat.prototype.showWithScript = function(script, taskName, currentTaskId) {
     ui.script_editor.setText(script);
     scriptOperations.updateScriptPreview(this);
     scriptOperations.updateLineNumbers();
+
+    // 切换到脚本tab显示
+    ui.post(function() {
+        ui.view_chat.attr('visibility', 'gone');
+        ui.view_script.attr('visibility', 'visible');
+        ui.input_area.attr('visibility', 'gone');
+        ui.quick_bar.attr('visibility', 'gone');
+        ui.tab_chat.attr('bg', C.surface);
+        ui.tab_script.attr('bg', C.primary);
+        ui.tab_chat_text.attr('textColor', C.textSecondary);
+        ui.tab_chat_text.attr('textStyle', 'normal');
+        ui.tab_script_text.attr('textColor', 'white');
+        ui.tab_script_text.attr('textStyle', 'bold');
+    });
 };
 
 // 导出方法引用

@@ -34,46 +34,48 @@ module.exports = {
         cardBackground:'#F5F7FA'
     },
 
-    // Font Awesome 图标（需要加载 fa-solid-900.ttf）
+    // Font Awesome 6 Solid 图标
     icons: {
         play:        '\uf04b',  // 播放/执行
-        stop:        '\uf04d',  // 停止
+        stop:        '\uf28d',  // 停止 (circle-stop)
         xmark:       '\uf00d',  // 删除/关闭
-        pen:         '\uf044',  // 编辑（edit）
-        arrowLeft:   '\uf060',  // 返回
+        trash:       '\uf1f8',  // 垃圾桶 (trash-can)
+        pen:         '\uf304',  // 编辑
+        arrowLeft:   '\uf060',  // 返回 (arrow-left)
         download:    '\uf019',  // 下载/导入
         upload:      '\uf093',  // 上传/导出
-        save:        '\uf0c7',  // 保存（磁盘）
-        ellipsis:    '\uf141',  // 更多
+        upload2:     '\uf0ee',  // 上传云 (cloud-arrow-up)
+        save:        '\uf0c7',  // 保存 (floppy-disk)
+        ellipsis:    '\uf141',  // 更多 (ellipsis)
         bars:        '\uf0c9',  // 菜单/列表
-        code:        '\uf121',  // 代码/格式化
+        code:        '\uf121',  // 代码
         star:        '\uf005',  // 星级
         user:        '\uf007',  // 用户/作者
-        refresh:     '\uf021',  // 刷新
-        plus:        '\uf067',  // 添加
-        clipboardList: '\uf46d', // 片段
-        robot:       '\uf544',  // AI 机器人
-        comment:     '\uf075',  // 对话
+        refresh:     '\uf021',  // 刷新 (arrows-rotate)
+        plus:        '\u002b',  // 添加
+        clipboardList: '\uf328', // 剪贴板 (clipboard)
+        robot:       '\uf120',  // AI 机器人 (terminal)
+        comment:     '\uf075',  // 对话 (comment)
         eye:         '\uf06e',  // 眼睛（显示密码）
         eyeSlash:    '\uf070',  // 眼睛划线（隐藏密码）
-        magic:       '\uf0d0',  // 魔法棒（格式化）
-        undo:        '\uf0e2',  // 撤销（重置）
+        magic:       '\uf0e7',  // 魔法棒（格式化）(bolt)
+        undo:        '\uf2ea',  // 撤销（重置）(rotate-left)
         cloud:       '\uf0c2',  // 云（任务中心）
         arrowUp:     '\uf062',  // 向上箭头
         arrowDown:   '\uf063',  // 向下箭头
-        circle:      '\uf111',  // 实心圆
-        circleO:     '\uf10c',  // 空心圆
+        circle:      '\uf111',  // 圆
+        circleO:     '\uf111',  // 空心圆（同 circle）
         check:       '\uf00c',  // 对勾
         pause:       '\uf04c',  // 暂停
         square:      '\uf0c8',  // 方块
-        cog:         '\uf013',  // 齿轮（设置）
-        spinner:     '\uf110',  // 加载中
+        cog:         '\uf013',  // 齿轮（设置）(gear)
+        spinner:     '\uf110',  // 加载中 (spinner)
         clock:       '\uf017',  // 时钟
-        info:        '\uf129',  // 信息
-        calendar:    '\uf073',   // 日历
-        paperPlane:  '\uf1d8',  // 纸飞机（发送）
+        info:        '\uf05a',  // 信息 (circle-info)
+        calendar:    '\uf133',  // 日历
+        paperPlane:  '\uf1d8',  // 纸飞机（发送）(paper-plane)
         crosshairs:  '\uf05b',  // 十字准星（坐标拾取）
-        target:      '\uf05b',  // 目标（别名）
+        target:      '\uf140',  // 目标 (bullseye)
     },
 
     // 状态映射

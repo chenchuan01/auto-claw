@@ -3,6 +3,7 @@
  */
 
 var Config = require('../core/config');
+var HeaderBuilder = require('./header_builder');
 var C = Config.colors;
 var I = Config.icons;
 
@@ -18,17 +19,19 @@ UISettings.prototype.show = function() {
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
-        '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
-        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="24sp" textColor="#FFFFFF" padding="4 4 12 4"/>' +
-        '    <text text="AI 设置" textSize="22sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
-        '    <text id="btn_save" text="' + I.save + '" textSize="22sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
-        '  </horizontal>' +
+        HeaderBuilder.buildHeader({
+            title: 'AI 设置',
+            leftIcon: I.arrowLeft,
+            leftIconId: 'btn_back',
+            rightIcon: I.save,
+            rightIconId: 'btn_save'
+        }) +
         '  <!-- 内容区域 -->' +
         '  <scroll bg="' + C.bg + '">' +
         '    <vertical padding="20">' +
         '      <!-- API 配置 -->' +
         '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24">' +
-        '        <text text="API 配置" textSize="18sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="20"/>' +
+        '        <text text="API 配置" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
         '        ' +
         '        <text text="API URL" textSize="14sp" textColor="' + C.textSecondary + '" marginBottom="8"/>' +
         '        <input id="input_api_url" hint="https://api.openai.com/v1" text="' + aiConfig.apiUrl + '" textSize="14sp" textColor="' + C.textPrimary + '" bg="' + C.surface + '" padding="12" cornerRadius="12" singleLine="true"/>' +
@@ -42,7 +45,7 @@ UISettings.prototype.show = function() {
         '      ' +
         '      <!-- 消息格式 -->' +
         '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
-        '        <text text="消息格式" textSize="18sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="16"/>' +
+        '        <text text="消息格式" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
         '        ' +
         '        <horizontal id="radio_openai" padding="12" bg="' + (aiConfig.messageFormat === 'openai' ? C.primary + '22' : '#00000000') + '" cornerRadius="12" marginBottom="12">' +
         '          <text id="icon_openai" text="' + (aiConfig.messageFormat === 'openai' ? '●' : '○') + '" textSize="20sp" textColor="' + C.primary + '" marginRight="12"/>' +
@@ -63,7 +66,7 @@ UISettings.prototype.show = function() {
         '      ' +
         '      <!-- 说明 -->' +
         '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
-        '        <text text="' + I.bars + ' 使用说明" textSize="14sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
+        '        <text text="使用说明" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
         '        <text text="1. 配置 API URL 和 Key 后即可使用 AI 对话功能" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
         '        <text text="2. OpenAI 格式填 base URL，自动拼接 /chat/completions" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
         '        <text text="3. Anthropic 格式填 base URL，自动拼接 /v1/messages" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
@@ -86,7 +89,7 @@ UISettings.prototype.show = function() {
     );
 
     ui.btn_back.on('click', function() {
-        mgr.showMainView();
+        back();
     });
 
     ui.btn_save.on('click', function() {

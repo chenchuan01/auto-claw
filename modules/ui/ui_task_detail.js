@@ -3,6 +3,8 @@
  */
 
 var Config = require('../core/config');
+var HeaderBuilder = require('./header_builder');
+var xmlEscape = require('../utils/xml_escape');
 var C = Config.colors;
 var I = Config.icons;
 
@@ -31,33 +33,33 @@ UITaskDetail.prototype.show = function(taskId) {
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
-        '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
-        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="24sp" textColor="#FFFFFF" padding="4 4 12 4"/>' +
-        '    <text text="任务详情" textSize="22sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
-        '    <text id="btn_edit" text="' + I.pen + '" textSize="24sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
-        '  </horizontal>' +
+        HeaderBuilder.buildHeader({
+            title: '任务详情',
+            leftIcon: I.arrowLeft,
+            leftIconId: 'btn_back',
+            rightIcon: I.pen,
+            rightIconId: 'btn_edit'
+        }) +
         '  <!-- 内容区域 -->' +
         '  <scroll bg="' + C.bg + '">' +
         '    <vertical padding="20">' +
         '      <!-- 任务卡片 -->' +
-        '      <vertical bg="' + C.card + '" cornerRadius="26" padding="24">' +
+        '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24">' +
         '        <text text="' + task.name + '" textSize="22sp" textColor="' + C.textPrimary + '" textStyle="bold"/>' +
         '        <text text="' + (task.description || '暂无描述') + '" textSize="14sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
         '        <horizontal marginTop="18" gravity="center_vertical">' +
-        '          <text id="task_status_badge" text="' + statusInfo.text + '" textSize="13sp" textColor="white" bg="' + statusInfo.color + '" padding="6 14" cornerRadius="26" textStyle="bold"/>' +
+        '          <text id="task_status_badge" text="' + statusInfo.text + '" textSize="13sp" textColor="#FFFFFF" bg="' + statusInfo.color + '" padding="6 14" cornerRadius="26" textStyle="bold"/>' +
         '          <text id="task_run_count" text="' + I.play + ' 执行 ' + (task.runCount || 0) + ' 次" textSize="13sp" textColor="' + C.textHint + '" layout_weight="1" gravity="right"/>' +
         '        </horizontal>' +
         '      </vertical>' +
         '      <!-- 任务脚本预览 -->' +
-        '      <vertical bg="' + C.card + '" cornerRadius="26" padding="20" marginTop="16">' +
-        '        <horizontal gravity="center_vertical" marginBottom="12">' +
-        '          <text text="' + I.code + ' 任务脚本" textSize="15sp" textColor="' + C.accent + '" textStyle="bold" layout_weight="1"/>' +
-        '        </horizontal>' +
-        '        <input id="script_preview" text="' + (task.script || '暂无脚本') + '" textSize="12sp" textColor="' + C.textPrimary + '" bg="' + C.surface + '" padding="12" cornerRadius="18" minLines="8" maxLines="20" gravity="top" singleLine="false" inputType="textMultiLine"/>' +
+        '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
+        '        <text text="任务脚本" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
+        '        <input id="script_preview" textSize="12sp" textColor="' + C.textPrimary + '" bg="' + C.surface + '" padding="12" cornerRadius="18" minLines="8" maxLines="20" gravity="top" singleLine="false" inputType="textMultiLine"/>' +
         '      </vertical>' +
         '      <!-- 任务信息 -->' +
-        '      <vertical bg="' + C.card + '" cornerRadius="26" padding="24" marginTop="16">' +
-        '        <text text="任务信息" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="16"/>' +
+        '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
+        '        <text text="任务信息" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
         '        <horizontal padding="0 8" marginTop="12">' +
         '          <text text="创建时间" textSize="14sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
         '          <text text="' + mgr.formatTime(task.createTime) + '" textSize="14sp" textColor="' + C.textPrimary + '"/>' +
@@ -78,7 +80,7 @@ UITaskDetail.prototype.show = function(taskId) {
         '      <!-- 操作按钮 -->' +
         '      <vertical marginTop="20">' +
         '        <horizontal>' +
-        '        <button id="btn_run_now" text="' + I.play + ' 执行任务" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="15sp" cornerRadius="22" h="48" textStyle="bold"/>' +
+        '        <button id="btn_run_now" text="' + I.play + ' 执行任务" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="#FFFFFF" textSize="15sp" cornerRadius="22" h="48" textStyle="bold"/>' +
         '          <button id="btn_logs" text="' + I.bars + ' 查看日志" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="15sp" cornerRadius="22" h="48"/>' +
         '        </horizontal>' +
         '        <horizontal marginTop="12">' +
@@ -104,6 +106,9 @@ UITaskDetail.prototype.show = function(taskId) {
 
     updateRunButton();
 
+    // 动态设置脚本内容（避免XML转义问题）
+    ui.script_preview.setText(task.script || '暂无脚本');
+
     // 应用 Font Awesome 字体
     mgr.fontManager.apply(ui.btn_back, ui.btn_edit, ui.btn_run_now, ui.btn_logs, ui.btn_delete, ui.task_run_count, ui.task_author);
 
@@ -118,7 +123,7 @@ UITaskDetail.prototype.show = function(taskId) {
 
     ui.btn_back.on('click', function() {
         self.stopPolling();
-        mgr.showMainView();
+        back();
     });
     ui.btn_edit.on('click', function() {
         self.stopPolling();

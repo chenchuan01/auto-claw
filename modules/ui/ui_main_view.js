@@ -3,6 +3,7 @@
  */
 
 var Config = require('../core/config');
+var HeaderBuilder = require('./header_builder');
 var C = Config.colors;
 var I = Config.icons;
 
@@ -18,10 +19,11 @@ UIMainView.prototype.show = function() {
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
-        '  <horizontal bg="' + C.primary + '" padding="20 12 16 12" gravity="center_vertical">' +
-        '    <text text="AutoClaw" textSize="26sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
-        '    <text id="btn_settings" text="' + I.cog + '" textSize="22sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
-        '  </horizontal>' +
+        HeaderBuilder.buildHeader({
+            title: 'AutoClaw',
+            rightIcon: I.cog,
+            rightIconId: 'btn_settings'
+        }) +
         '  <!-- 任务列表区域 -->' +
         '  <frame layout_weight="1">' +
         '    <list id="task_list" bg="' + C.bg + '">' +
@@ -30,18 +32,18 @@ UIMainView.prototype.show = function() {
         '        <!-- 第一行：任务名称 + 状态标签 -->' +
         '        <horizontal gravity="center_vertical">' +
         '          <text id="task_name" text="{{this.name}}" textSize="19sp" textColor="' + C.textPrimary + '" textStyle="bold" layout_weight="1"/>' +
-        '          <text id="status_tag" text="{{this.statusText}}" textSize="11sp" textColor="white" bg="{{this.statusColor}}" padding="4 8" cornerRadius="10"/>' +
+        '          <text id="status_tag" text="{{this.statusText}}" textSize="11sp" textColor="#FFFFFF" bg="{{this.statusColor}}" padding="4 8" cornerRadius="10"/>' +
         '        </horizontal>' +
         '        <!-- 第二行：描述 -->' +
         '        <text id="task_desc" text="{{this.description}}" textSize="13sp" textColor="' + C.textSecondary + '" maxLines="1" marginTop="6"/>' +
         '        <!-- 第三行：次要信息 -->' +
         '        <horizontal gravity="center_vertical" marginTop="10">' +
-        '          <text text="' + I.clock + ' {{this.lastRunTimeText}}" textSize="11sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
-        '          <text text="' + I.refresh + ' {{this.runCount}} 次" textSize="11sp" textColor="' + C.textHint + '"/>' +
+        '          <text id="last_run_time" text="' + I.calendar + ' {{this.lastRunTimeText}}" textSize="11sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
+        '          <text id="run_count" text="' + I.play + ' {{this.runCount}} 次" textSize="11sp" textColor="' + C.textHint + '"/>' +
         '        </horizontal>' +
         '        <!-- 操作按钮 -->' +
         '        <horizontal marginTop="12">' +
-        '          <button id="btn_run" text="' + I.play + ' 执行" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="24" h="42" textStyle="bold"/>' +
+        '          <button id="btn_run" text="' + I.play + ' 执行" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="24" h="42" textStyle="bold"/>' +
         '          <button id="btn_manage" text="' + I.ellipsis + ' 管理" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="24" h="42"/>' +
         '        </horizontal>' +
         '        </vertical>' +
@@ -190,7 +192,7 @@ UIMainView.prototype.bindEvents = function() {
         }
 
         // 应用 Font Awesome 字体到图标
-        mgr.fontManager.apply(itemView.btn_run, itemView.btn_manage, itemView.status_dot);
+        mgr.fontManager.apply(itemView.btn_run, itemView.btn_manage, itemView.last_run_time, itemView.run_count);
 
         itemView.btn_run.on('click', function() {
             if (itemHolder && itemHolder.item) {

@@ -4,6 +4,8 @@
  */
 
 var Config = require('../../core/config');
+var HeaderBuilder = require('../header_builder');
+var scriptOperations = require('./scriptOperations');
 var C = Config.colors;
 var I = Config.icons;
 
@@ -14,17 +16,19 @@ function buildLayout() {
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
-        '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
-        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="24sp" textColor="#FFFFFF" padding="4 4 12 4"/>' +
-        '    <text text="AI 助手" textSize="22sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
-        '    <text id="btn_new_chat" text="' + I.plus + '" textSize="22sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
-        '  </horizontal>' +
+        HeaderBuilder.buildHeader({
+            title: 'AI 助手',
+            leftIcon: I.arrowLeft,
+            leftIconId: 'btn_back',
+            rightIcon: I.plus,
+            rightIconId: 'btn_new_chat'
+        }) +
         '  <!-- Tab 切换 -->' +
         '  <horizontal bg="' + C.card + '" padding="8">' +
-        '    <horizontal id="tab_chat" layout_weight="1" gravity="center" padding="12 8" bg="' + C.primary + '22" cornerRadius="12" marginRight="4">' +
-        '      <text id="tab_chat_text" text="' + I.comment + ' 对话" textSize="15sp" textColor="' + C.primary + '" textStyle="bold"/>' +
+        '    <horizontal id="tab_chat" layout_weight="1" gravity="center" padding="12 8" bg="' + C.primary + '" cornerRadius="12" marginRight="4">' +
+        '      <text id="tab_chat_text" text="' + I.comment + ' 对话" textSize="15sp" textColor="#FFFFFF" textStyle="bold"/>' +
         '    </horizontal>' +
-        '    <horizontal id="tab_script" layout_weight="1" gravity="center" padding="12 8" bg="#00000000" cornerRadius="12" marginLeft="4">' +
+        '    <horizontal id="tab_script" layout_weight="1" gravity="center" padding="12 8" bg="' + C.surface + '" cornerRadius="12" marginLeft="4">' +
         '      <text id="tab_script_text" text="' + I.code + ' 脚本" textSize="15sp" textColor="' + C.textSecondary + '"/>' +
         '    </horizontal>' +
         '  </horizontal>' +
@@ -40,9 +44,9 @@ function buildLayout() {
         '      <!-- 编辑器工具栏 -->' +
         '      <horizontal bg="' + C.card + '" cornerRadius="12 12 0 0" padding="12 10" gravity="center_vertical">' +
         '        <text id="script_title" text="暂无脚本" textSize="13sp" textColor="' + C.textSecondary + '" layout_weight="1" singleLine="true"/>' +
-        '        <text id="btn_pick_coordinate" text="' + I.target + ' 拾取坐标" textSize="12sp" textColor="' + C.primary + '" bg="' + C.primary + '22" padding="6 10" cornerRadius="8" marginRight="8"/>' +
-        '        <text id="btn_format" text="格式化" textSize="12sp" textColor="' + C.primary + '" bg="' + C.primary + '22" padding="6 10" cornerRadius="8" marginRight="8"/>' +
-        '        <text id="btn_clear_script" text="清空" textSize="12sp" textColor="' + C.error + '" bg="' + C.error + '22" padding="6 10" cornerRadius="8"/>' +
+        '        <text id="btn_pick_coordinate" text="' + I.target + '" textSize="16sp" textColor="#FFFFFF" bg="' + C.info + '" w="36" h="36" gravity="center" cornerRadius="18" marginRight="6"/>' +
+        '        <text id="btn_format" text="' + I.magic + '" textSize="16sp" textColor="#FFFFFF" bg="' + C.warning + '" w="36" h="36" gravity="center" cornerRadius="18" marginRight="6"/>' +
+        '        <text id="btn_clear_script" text="' + I.trash + '" textSize="16sp" textColor="#FFFFFF" bg="' + C.error + '" w="36" h="36" gravity="center" cornerRadius="18"/>' +
         '      </horizontal>' +
         '      <!-- 编辑区域 -->' +
         '      <horizontal bg="' + C.surface + '" cornerRadius="0 0 12 12" layout_weight="1">' +
@@ -59,17 +63,14 @@ function buildLayout() {
         '      </horizontal>' +
         '      <!-- 底部按钮 -->' +
         '      <horizontal marginTop="12">' +
-        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.success + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="4" textStyle="bold"/>' +
-        '        <button id="btn_view_logs" text="' + I.clock + ' 日志" bg="' + C.info + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" visibility="gone"/>' +
-        '      </horizontal>' +
-        '      <horizontal marginTop="8">' +
-        '        <button id="btn_save_task" text="' + I.save + ' 保存任务" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" textStyle="bold"/>' +
+        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.primary + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="6" textStyle="bold"/>' +
+        '        <button id="btn_save_task" text="' + I.save + ' 保存任务" bg="#FFFFFF" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="6" textStyle="bold"/>' +
         '      </horizontal>' +
         '    </vertical>' +
         '  </frame>' +
         '  <!-- 快捷操作栏 -->' +
         '  <horizontal id="quick_bar" bg="' + C.card + '" padding="8 8 12 8" gravity="center_vertical">' +
-        '    <text id="btn_quick_pick" text="' + I.target + ' 拾取坐标到对话" textSize="12sp" textColor="' + C.primary + '" bg="' + C.primary + '22" padding="6 10" cornerRadius="8"/>' +
+        '    <text id="btn_quick_pick" text="' + I.target + ' 拾取坐标到对话" textSize="12sp" textColor="' + C.textSecondary + '" bg="' + C.surface + '" padding="6 10" cornerRadius="8"/>' +
         '  </horizontal>' +
         '  <!-- 输入区域 -->' +
         '  <horizontal id="input_area" bg="' + C.card + '" padding="12 8 12 12" gravity="center_vertical">' +
@@ -87,17 +88,19 @@ function buildLayoutWithEdit(taskName) {
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
-        '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
-        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="24sp" textColor="#FFFFFF" padding="4 4 12 4"/>' +
-        '    <text text="AI 编辑: ' + (taskName || '脚本') + '" textSize="22sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
-        '    <text id="btn_new_chat" text="' + I.plus + '" textSize="22sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
-        '  </horizontal>' +
+        HeaderBuilder.buildHeader({
+            title: 'AI 编辑: ' + (taskName || '脚本'),
+            leftIcon: I.arrowLeft,
+            leftIconId: 'btn_back',
+            rightIcon: I.plus,
+            rightIconId: 'btn_new_chat'
+        }) +
         '  <!-- Tab 切换 -->' +
         '  <horizontal bg="' + C.card + '" padding="8">' +
-        '    <horizontal id="tab_chat" layout_weight="1" gravity="center" padding="12 8" bg="' + C.primary + '22" cornerRadius="12" marginRight="4">' +
-        '      <text id="tab_chat_text" text="' + I.comment + ' 对话" textSize="15sp" textColor="' + C.primary + '" textStyle="bold"/>' +
+        '    <horizontal id="tab_chat" layout_weight="1" gravity="center" padding="12 8" bg="' + C.primary + '" cornerRadius="12" marginRight="4">' +
+        '      <text id="tab_chat_text" text="' + I.comment + ' 对话" textSize="15sp" textColor="#FFFFFF" textStyle="bold"/>' +
         '    </horizontal>' +
-        '    <horizontal id="tab_script" layout_weight="1" gravity="center" padding="12 8" bg="#00000000" cornerRadius="12" marginLeft="4">' +
+        '    <horizontal id="tab_script" layout_weight="1" gravity="center" padding="12 8" bg="' + C.surface + '" cornerRadius="12" marginLeft="4">' +
         '      <text id="tab_script_text" text="' + I.code + ' 脚本" textSize="15sp" textColor="' + C.textSecondary + '"/>' +
         '    </horizontal>' +
         '  </horizontal>' +
@@ -132,17 +135,14 @@ function buildLayoutWithEdit(taskName) {
         '      </horizontal>' +
         '      <!-- 底部按钮 -->' +
         '      <horizontal marginTop="12">' +
-        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.success + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="4" textStyle="bold"/>' +
-        '        <button id="btn_view_logs" text="' + I.clock + ' 日志" bg="' + C.info + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" visibility="gone"/>' +
-        '      </horizontal>' +
-        '      <horizontal marginTop="8">' +
-        '        <button id="btn_save_task" text="' + I.save + ' 保存任务" bg="' + C.primary + '" textColor="white" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" textStyle="bold"/>' +
+        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.primary + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="6" textStyle="bold"/>' +
+        '        <button id="btn_save_task" text="' + I.save + ' 保存任务" bg="#FFFFFF" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="6" textStyle="bold"/>' +
         '      </horizontal>' +
         '    </vertical>' +
         '  </frame>' +
         '  <!-- 快捷操作栏 -->' +
         '  <horizontal id="quick_bar" bg="' + C.card + '" padding="8 8 12 8" gravity="center_vertical">' +
-        '    <text id="btn_quick_pick" text="' + I.target + ' 拾取坐标到对话" textSize="12sp" textColor="' + C.primary + '" bg="' + C.primary + '22" padding="6 10" cornerRadius="8"/>' +
+        '    <text id="btn_quick_pick" text="' + I.target + ' 拾取坐标到对话" textSize="12sp" textColor="' + C.textSecondary + '" bg="' + C.surface + '" padding="6 10" cornerRadius="8"/>' +
         '  </horizontal>' +
         '  <!-- 输入区域 -->' +
         '  <horizontal id="input_area" bg="' + C.card + '" padding="12 8 12 12" gravity="center_vertical">' +
@@ -175,7 +175,7 @@ function bindEvents(self, mgr) {
     });
 
     ui.btn_back.on('click', function() {
-        mgr.showMainView();
+        back();
     });
 
     ui.btn_new_chat.on('click', function() {
@@ -194,16 +194,18 @@ function bindEvents(self, mgr) {
     });
 
     ui.btn_save_task.on('click', function() {
-        self.saveAsTask(self);
+        scriptOperations.saveAsTask(self);
     });
 
     ui.btn_run_script.on('click', function() {
-        self.runScript(self);
+        scriptOperations.runScript(self);
     });
 
-    ui.btn_view_logs.on('click', function() {
-        self.viewTempTaskLogs(self);
-    });
+    if (ui.btn_view_logs) {
+        ui.btn_view_logs.on('click', function() {
+            scriptOperations.viewTempTaskLogs(self);
+        });
+    }
 
     ui.btn_clear_script.on('click', function() {
         dialogs.confirm('清空脚本', '确定要清空编辑器中的脚本吗？', function(confirmed) {
@@ -235,7 +237,7 @@ function bindEvents(self, mgr) {
     // 编辑器内容变化时更新行号
     ui.script_editor.addTextChangedListener({
         afterTextChanged: function(editable) {
-            self.updateLineNumbers();
+            scriptOperations.updateLineNumbers();
         }
     });
 
@@ -270,7 +272,8 @@ function bindEventsWithEdit(self, mgr) {
     });
 
     ui.btn_back.on('click', function() {
-        mgr.showTaskDetail(self.currentTaskId);
+        // 直接返回上一页，不需要指定任务ID
+        back();
     });
 
     ui.btn_new_chat.on('click', function() {
@@ -289,16 +292,18 @@ function bindEventsWithEdit(self, mgr) {
     });
 
     ui.btn_save_task.on('click', function() {
-        self.saveAsTask(self);
+        scriptOperations.saveAsTask(self);
     });
 
     ui.btn_run_script.on('click', function() {
-        self.runScript(self);
+        scriptOperations.runScript(self);
     });
 
-    ui.btn_view_logs.on('click', function() {
-        self.viewTempTaskLogs(self);
-    });
+    if (ui.btn_view_logs) {
+        ui.btn_view_logs.on('click', function() {
+            scriptOperations.viewTempTaskLogs(self);
+        });
+    }
 
     ui.btn_clear_script.on('click', function() {
         dialogs.confirm('清空脚本', '确定要清空编辑器中的脚本吗？', function(confirmed) {
@@ -330,7 +335,7 @@ function bindEventsWithEdit(self, mgr) {
     // 编辑器内容变化时更新行号
     ui.script_editor.addTextChangedListener({
         afterTextChanged: function(editable) {
-            self.updateLineNumbers();
+            scriptOperations.updateLineNumbers();
         }
     });
 

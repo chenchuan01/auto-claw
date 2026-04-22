@@ -11,9 +11,9 @@ var UITaskDetail = require('./ui_task_detail');
 var UITaskLogs = require('./ui_task_logs');
 var UIMarketView = require('./ui_market_view');
 var UIDialogs = require('./ui_dialogs');
-var UIScriptEditor = require('./ui_script_editor');
+var UIScriptEditor = require('./script_editor/main');
 var UISettings = require('./ui_settings');
-var UIAIChat = require('./ui_ai_chat');
+var UIAIChat = require('./ai_chat/main');
 var UISchedule = require('./ui_schedule');
 var FontManager = require('../core/font_manager');
 var AIService = require('../ai/ai_service');
@@ -29,7 +29,7 @@ function UIManager(dataManager, taskExecutor, marketService, recorder) {
     this.fabWindow = null;
     this.refreshInterval = null;
 
-    this.fontManager = new FontManager();
+    this.fontManager = new FontManager('fontawesome');
     this.fontManager.load();
 
     this.aiService = new AIService();
@@ -45,7 +45,25 @@ function UIManager(dataManager, taskExecutor, marketService, recorder) {
     this.scheduleView = new UISchedule(this);
     this.scheduler = new Scheduler(dataManager, taskExecutor);
     this.scheduler.start();
+
+    // 设置状态栏颜色与 header 一致
+    this.setStatusBarColor();
 }
+
+UIManager.prototype.setStatusBarColor = function() {
+    try {
+        var color = android.graphics.Color.parseColor(C.primary);
+        activity.getWindow().setStatusBarColor(color);
+        // 状态栏图标用浅色（白色），与深色 header 搭配
+        var decorView = activity.getWindow().getDecorView();
+        var flags = decorView.getSystemUiVisibility();
+        // 清除 LIGHT_STATUS_BAR 标志，使图标显示为白色
+        flags = flags & ~android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        decorView.setSystemUiVisibility(flags);
+    } catch (e) {
+        console.log('[UIManager] 设置状态栏颜色失败: ' + e.message);
+    }
+};
 
 UIManager.prototype.showMainView = function() {
     this.currentView = 'main';
@@ -134,10 +152,10 @@ UIManager.prototype.showAIChat = function() {
     this.setupBackHandler();
 };
 
-UIManager.prototype.startAIEditWithScript = function(script, taskName) {
+UIManager.prototype.startAIEditWithScript = function(script, taskName, taskId) {
     this.currentView = 'ai_chat';
     this.stopAutoRefresh();
-    this.aiChat.showWithScript(script, taskName);
+    this.aiChat.showWithScript(script, taskName, taskId);
     this.setupBackHandler();
 };
 
@@ -172,7 +190,7 @@ UIManager.prototype.buildBottomNav = function(activeTab) {
         '      <text text="任务列表" textSize="10sp" textColor="' + tasksColor + '" gravity="center" marginTop="4"/>' +
         '    </vertical>' +
         '    <vertical id="nav_btn_ai" layout_weight="1" gravity="center" padding="8 4">' +
-        '      <text id="nav_icon_ai" text="' + I.robot + '" w="56" h="56" bg="' + C.primary + '" textColor="white" textSize="26sp" gravity="center" cornerRadius="28" textStyle="bold"/>' +
+        '      <text id="nav_icon_ai" text="' + I.robot + '" w="56" h="56" bg="' + C.primary + '" textColor="#FFFFFF" textSize="26sp" gravity="center" cornerRadius="28" textStyle="bold"/>' +
         '    </vertical>' +
         '    <vertical id="nav_btn_market" layout_weight="1" gravity="center" padding="12 8">' +
         '      <text id="nav_icon_market" text="' + I.cloud + '" textSize="20sp" textColor="' + marketColor + '" gravity="center"/>' +

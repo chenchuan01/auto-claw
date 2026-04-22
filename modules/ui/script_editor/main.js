@@ -3,7 +3,8 @@
  * 提供任务详情查看和脚本编辑功能
  */
 
-var Config = require('../../config');
+var Config = require('../../core/config');
+var HeaderBuilder = require('../header_builder');
 var codeUtils = require('./codeUtils');
 var C = Config.colors;
 var I = Config.icons;
@@ -34,11 +35,13 @@ UIScriptEditor.prototype.show = function(taskId) {
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
-        '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
-        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="24sp" textColor="#FFFFFF" padding="4 4 12 4"/>' +
-        '    <text text="任务详情与编辑" textSize="22sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
-        '    <text id="btn_save" text="' + I.save + '" textSize="22sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
-        '  </horizontal>' +
+        HeaderBuilder.buildHeader({
+            title: '任务详情与编辑',
+            leftIcon: I.arrowLeft,
+            leftIconId: 'btn_back',
+            rightIcon: I.save,
+            rightIconId: 'btn_save'
+        }) +
         '  <!-- 内容区域 -->' +
         '  <scroll bg="' + C.bg + '">' +
         '    <vertical padding="20">' +
@@ -47,16 +50,14 @@ UIScriptEditor.prototype.show = function(taskId) {
         '        <text text="' + task.name + '" textSize="22sp" textColor="' + C.textPrimary + '" textStyle="bold"/>' +
         '        <text text="' + (task.description || '暂无描述') + '" textSize="14sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
         '        <horizontal marginTop="18" gravity="center_vertical">' +
-        '          <text text="' + statusInfo.text + '" textSize="13sp" textColor="white" bg="' + statusInfo.color + '" padding="6 14" cornerRadius="20" textStyle="bold"/>' +
+        '          <text text="' + statusInfo.text + '" textSize="13sp" textColor="#FFFFFF" bg="' + statusInfo.color + '" padding="6 14" cornerRadius="20" textStyle="bold"/>' +
         '          <text id="task_run_count" text="' + I.play + ' 执行 ' + (task.runCount || 0) + ' 次" textSize="13sp" textColor="' + C.textHint + '" layout_weight="1" gravity="right"/>' +
         '        </horizontal>' +
         '      </vertical>' +
         '      <!-- 脚本编辑器 -->' +
         '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
         '        <!-- 第一行：标题 -->' +
-        '        <horizontal gravity="center_vertical" marginBottom="12">' +
-        '          <text text="' + I.code + ' 任务脚本" textSize="15sp" textColor="' + C.accent + '" textStyle="bold" layout_weight="1"/>' +
-        '        </horizontal>' +
+        '        <text text="任务脚本" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
         '        <!-- 第二行：快捷按钮 -->' +
         '        <horizontal gravity="center_vertical">' +
         '          <text id="btn_ai_edit" text="' + I.robot + ' AI编辑" textSize="13sp" textColor="' + C.primary + '" padding="6 12" bg="' + C.primary + '22" cornerRadius="8" marginRight="8"/>' +
@@ -68,7 +69,7 @@ UIScriptEditor.prototype.show = function(taskId) {
         '      </vertical>' +
         '      <!-- 任务信息 -->' +
         '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
-        '        <text text="' + I.bars + ' 任务信息" textSize="14sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="16"/>' +
+        '        <text text="任务信息" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
         '        <horizontal padding="0 8" marginTop="12">' +
         '          <text text="创建时间" textSize="14sp" textColor="' + C.textHint + '" layout_weight="1"/>' +
         '          <text text="' + mgr.formatTime(task.createTime) + '" textSize="14sp" textColor="' + C.textPrimary + '"/>' +
@@ -89,7 +90,7 @@ UIScriptEditor.prototype.show = function(taskId) {
         '      <!-- 操作按钮 -->' +
         '      <vertical marginTop="24">' +
         '        <horizontal>' +
-        '          <button id="btn_run_now" text="' + I.play + ' 执行任务" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="white" textSize="15sp" cornerRadius="16" h="48" textStyle="bold"/>' +
+        '          <button id="btn_run_now" text="' + I.play + ' 执行任务" layout_weight="1" marginRight="8" bg="' + C.primary + '" textColor="#FFFFFF" textSize="15sp" cornerRadius="16" h="48" textStyle="bold"/>' +
         '          <button id="btn_logs" text="' + I.bars + ' 查看日志" layout_weight="1" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="15sp" cornerRadius="16" h="48"/>' +
         '        </horizontal>' +
         '        <button id="btn_delete" text="' + I.xmark + ' 删除任务" bg="' + C.error + '" textColor="#FFFFFF" textSize="15sp" cornerRadius="16" h="48" marginTop="12"/>' +
@@ -113,7 +114,7 @@ UIScriptEditor.prototype.show = function(taskId) {
 
     ui.btn_ai_edit.on('click', function() {
         var currentScript = ui.script_input.getText().toString();
-        mgr.startAIEditWithScript(currentScript, task.name);
+        mgr.startAIEditWithScript(currentScript, task.name, self.currentTaskId);
     });
 
     ui.btn_reset.on('click', function() {
@@ -206,11 +207,13 @@ UIScriptEditor.prototype.confirmExit = function() {
     if (currentScript !== self.scriptContent) {
         dialogs.confirm('退出编辑', '脚本已修改但未保存，确定要退出吗？', function(confirmed) {
             if (confirmed) {
-                mgr.showTaskDetail(self.currentTaskId);
+                // 直接返回上一页
+                back();
             }
         });
     } else {
-        mgr.showTaskDetail(self.currentTaskId);
+        // 直接返回上一页
+        back();
     }
 };
 

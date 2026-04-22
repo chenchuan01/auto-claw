@@ -25,7 +25,7 @@ Recorder.prototype.start = function() {
         '<frame gravity="center" bg="#CC000000" w="auto" h="auto">' +
         '  <horizontal padding="12 8" gravity="center_vertical">' +
         '    <text text="● 录制中" textSize="14sp" textColor="#FF4444" id="rec_label"/>' +
-        '    <button id="btn_stop" text="停止" textSize="12sp" textColor="white" ' +
+        '    <button id="btn_stop" text="停止" textSize="12sp" textColor="#FFFFFF" ' +
         '      style="Widget.AppCompat.Button.Borderless" marginLeft="8"/>' +
         '  </horizontal>' +
         '</frame>'

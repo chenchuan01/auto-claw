@@ -3,7 +3,9 @@
  * 显示完整任务日志，支持复制
  */
 
+var HeaderBuilder = require('./header_builder');
 var Config = require('../core/config');
+var xmlEscape = require('../utils/xml_escape');
 var C = Config.colors;
 var I = Config.icons;
 
@@ -39,20 +41,22 @@ UITaskLogs.prototype.show = function(taskId) {
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
-        '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
-        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="24sp" textColor="#FFFFFF" padding="4 4 12 4"/>' +
-        '    <text text="任务日志" textSize="22sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
-        '    <text id="btn_copy" text="' + I.clipboardList + '" textSize="22sp" textColor="#FFFFFF" padding="8 8 0 8"/>' +
-        '  </horizontal>' +
+        HeaderBuilder.buildHeader({
+            title: '任务日志',
+            leftIcon: I.arrowLeft,
+            leftIconId: 'btn_back',
+            rightIcon: I.clipboardList,
+            rightIconId: 'btn_copy'
+        }) +
         '  <!-- 日志内容 -->' +
         '  <scroll bg="' + C.bg + '" layout_weight="1">' +
         '    <vertical padding="16">' +
         '      <vertical bg="' + C.card + '" cornerRadius="16" padding="16">' +
-        '        <text id="log_content" text="' + logText.replace(/'/g, '\\\'') + '" textSize="12sp" textColor="' + C.textPrimary + '" lineSpacingExtra="4" textIsSelectable="true"/>' +
+        '        <text id="log_content" textSize="12sp" textColor="' + C.textPrimary + '" lineSpacingExtra="4" textIsSelectable="true"/>' +
         '      </vertical>' +
         (hasError ?
         '      <horizontal marginTop="16">' +
-        '        <button id="btn_copy_error" text="复制错误" bg="' + C.error + '" textColor="white" textSize="14sp" cornerRadius="12" h="40" layout_weight="1"/>' +
+        '        <button id="btn_copy_error" text="复制错误" bg="' + C.error + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="12" h="40" layout_weight="1"/>' +
         '      </horizontal>' : '') +
         '    </vertical>' +
         '  </scroll>' +
@@ -65,9 +69,12 @@ UITaskLogs.prototype.show = function(taskId) {
         mgr.fontManager.apply(ui.btn_copy_error);
     }
 
+    // 动态设置日志内容（避免XML转义问题）
+    ui.log_content.setText(logText);
+
     // 事件绑定
     ui.btn_back.on('click', function() {
-        mgr.showTaskDetail(self.taskId);
+        back();
     });
 
     ui.btn_copy.on('click', function() {

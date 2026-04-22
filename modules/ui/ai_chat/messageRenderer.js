@@ -3,9 +3,12 @@
  * 处理消息解析和UI渲染
  */
 
-var Config = require('../../config');
+var Config = require('../../core/config');
+var BubbleConfig = require('./bubbleConfig');
+var CodeHighlighter = require('../../utils/code_highlighter');
 var C = Config.colors;
 var I = Config.icons;
+var BC = BubbleConfig.MESSAGE_BUBBLE_CONFIG;
 
 /**
  * 解析 Markdown 分块，区分文本段落和代码块
@@ -78,40 +81,32 @@ function renderMessages(self) {
 
         self.messages.forEach(function(msg) {
             var isUser = msg.role === 'user';
-            var bgColor = isUser ? C.primary : C.card;
-            var textColor = isUser ? '#FFFFFF' : C.textPrimary;
-            var alignment = isUser ? 'right' : 'left';
-            var marginLeft = isUser ? '60' : '0';
-            var marginRight = isUser ? '0' : '60';
+            var bubbleStyle = isUser ? BC.userBubble : BC.aiBubble;
+            var bgColor = bubbleStyle.bgColor;
+            var textColor = bubbleStyle.textColor;
+            var alignment = bubbleStyle.alignment;
 
-            // 创建消息容器
-            var messageContainer = ui.inflate(
-                '<horizontal gravity="' + alignment + '" marginBottom="28">' +
-                '  <vertical id="content_container" bg="' + bgColor + '" cornerRadius="16" padding="12 16" marginLeft="' + marginLeft + '" marginRight="' + marginRight + '" maxWidth="*">' +
-                '  </vertical>' +
-                '</horizontal>'
+            // 创建外层容器（用于消息间隔）
+            var outerContainer = ui.inflate(
+                '<vertical>' +
+                '  <horizontal id="message_wrapper" gravity="' + alignment + '" marginLeft="' + BC.bubbleMarginLeft + '" marginRight="' + BC.bubbleMarginRight + '">' +
+                '    <vertical id="content_container" bg="' + bgColor + '" cornerRadius="' + BC.bubbleRadius + '" padding="' + BC.bubblePadding + '" w="' + BC.bubbleWidth + '">' +
+                '    </vertical>' +
+                '  </horizontal>' +
+                '  <View h="' + BC.bubbleMarginBottom + '"/>' +
+                '</vertical>'
             );
 
-            var contentContainer = messageContainer.content_container;
+            var messageWrapper = outerContainer.message_wrapper;
+            var contentContainer = messageWrapper.content_container;
             var blocks = parseMarkdownBlocks(msg.content);
 
-            // 用户消息：整个放在一个 TextView（不需要折叠）
-            if (isUser) {
-                var textView = ui.inflate(
-                    '<text id="msg_text" textSize="14sp" textColor="' + textColor + '" lineSpacingExtra="4" textIsSelectable="true"/>'
-                );
-                textView.setText(msg.content);
-                contentContainer.addView(textView);
-                container.addView(messageContainer);
-                return;
-            }
-
-            // AI 消息：分段渲染，代码块可折叠
+            // 用户消息和 AI 消息都支持 Markdown 渲染
             blocks.forEach(function(block) {
                 if (block.type === 'text') {
                     if (!block.content.trim()) return;
                     var textView = ui.inflate(
-                        '<text textSize="14sp" textColor="' + textColor + '" lineSpacingExtra="4" textIsSelectable="true"/>'
+                        '<text textSize="' + BC.textSize + '" textColor="' + textColor + '" lineSpacingExtra="' + BC.lineSpacing + '" textIsSelectable="true" gravity="' + BC.textGravity + '"/>'
                     );
                     self.markdownRenderer.render(textView, block.content, textColor);
                     contentContainer.addView(textView);
@@ -119,16 +114,20 @@ function renderMessages(self) {
                     var lineCount = block.content.split('\n').length;
                     var codeBlock = ui.inflate(
                         '<vertical>' +
-                        '  <horizontal id="code_header" bg="' + C.surface + '" cornerRadius="8" padding="8 10" gravity="center_vertical" marginTop="6" marginBottom="4">' +
-                        '    <text id="code_title" text="' + I.code + ' 代码 (' + lineCount + ' 行)" textSize="13sp" textColor="' + C.textPrimary + '" layout_weight="1"/>' +
+                        '  <horizontal id="code_header" bg="' + BC.codeBlock.bgColor + '" cornerRadius="' + BC.codeBlock.radius + '" padding="' + BC.codeBlock.headerPadding + '" gravity="center_vertical" marginTop="6" marginBottom="4">' +
+                        '    <text id="code_title" text="' + I.code + ' 代码 (' + lineCount + ' 行)" textSize="13sp" textColor="' + BC.codeBlock.textColor + '" layout_weight="1"/>' +
                         '    <text id="code_toggle" text="' + I.arrowDown + '" textSize="16sp" textColor="' + C.textSecondary + '"/>' +
                         '  </horizontal>' +
-                        '  <vertical id="code_content" bg="' + C.surface + '" cornerRadius="8" padding="10" visibility="visible">' +
-                        '    <text id="code_text" textSize="12sp" textColor="' + C.textPrimary + '" textIsSelectable="true"/>' +
+                        '  <vertical id="code_content" bg="' + BC.codeBlock.bgColor + '" cornerRadius="' + BC.codeBlock.radius + '" padding="' + BC.codeBlock.padding + '" visibility="visible">' +
+                        '    <text id="code_text" textSize="' + BC.codeBlock.textSize + '" textColor="' + BC.codeBlock.textColor + '" textIsSelectable="true" gravity="left"/>' +
                         '  </vertical>' +
                         '</vertical>'
                     );
-                    codeBlock.code_text.setText(block.content);
+
+                    // 使用语法高亮渲染代码
+                    var highlighter = new CodeHighlighter();
+                    highlighter.highlight(codeBlock.code_text, block.content, block.language);
+
                     // 默认展开
                     var expanded = true;
                     codeBlock.code_header.on('click', function() {
@@ -149,7 +148,7 @@ function renderMessages(self) {
                 }
             });
 
-            container.addView(messageContainer);
+            container.addView(outerContainer);
         });
 
         // 滚动到底部

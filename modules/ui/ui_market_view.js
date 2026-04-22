@@ -3,6 +3,8 @@
  */
 
 var Config = require('../core/config');
+var HeaderBuilder = require('./header_builder');
+var xmlEscape = require('../utils/xml_escape');
 var C = Config.colors;
 var I = Config.icons;
 
@@ -17,11 +19,13 @@ UIMarketView.prototype.show = function() {
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
-        '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
-        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="24sp" textColor="#FFFFFF" padding="4 4 12 4"/>' +
-        '    <text text="任务中心" textSize="22sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
-        '    <text id="btn_refresh" text="' + I.refresh + '" textSize="22sp" textColor="#FFFFFF" padding="8 8 8 12"/>' +
-        '  </horizontal>' +
+        HeaderBuilder.buildHeader({
+            title: '任务中心',
+            leftIcon: I.arrowLeft,
+            leftIconId: 'btn_back',
+            rightIcon: I.refresh,
+            rightIconId: 'btn_refresh'
+        }) +
         '  <!-- 市场列表 -->' +
         '  <list id="market_list" bg="' + C.bg + '" layout_weight="1">' +
         '    <vertical margin="12 16 12 16" bg="' + C.card + '" cornerRadius="20" padding="20" w="*">' +
@@ -33,7 +37,7 @@ UIMarketView.prototype.show = function() {
         '            <text id="market_author_name" text="{{author}}" textSize="12sp" textColor="' + C.textHint + '"/>' +
         '          </horizontal>' +
         '        </vertical>' +
-        '        <button id="btn_import" text="' + I.download + ' 导入" bg="' + C.primary + '" textColor="white" textSize="13sp" cornerRadius="14" h="36" w="68" marginLeft="8" textStyle="bold"/>' +
+        '        <button id="btn_import" text="' + I.download + ' 导入" bg="' + C.primary + '" textColor="#FFFFFF" textSize="13sp" cornerRadius="14" h="36" w="68" marginLeft="8" textStyle="bold"/>' +
         '      </horizontal>' +
         '      <text id="market_desc" text="{{description}}" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="10" maxLines="2"/>' +
         '      <horizontal marginTop="14">' +
@@ -48,8 +52,22 @@ UIMarketView.prototype.show = function() {
 
     this.loadData();
     mgr.fontManager.apply(ui.btn_back, ui.btn_refresh);
-    ui.btn_back.on('click', function() { mgr.showMainView(); });
-    ui.btn_refresh.on('click', function() { self.loadData(); });
+    ui.btn_back.on('click', function() { back(); });
+    ui.btn_refresh.on('click', function() {
+        // 旋转动画
+        var RotateAnimation = android.view.animation.RotateAnimation;
+        var Animation = android.view.animation.Animation;
+        var rotate = new RotateAnimation(
+            0, 360,
+            Animation.RELATIVE_TO_SELF, 0.5,
+            Animation.RELATIVE_TO_SELF, 0.5
+        );
+        rotate.setDuration(500);
+        ui.btn_refresh.startAnimation(rotate);
+
+        // 刷新数据（后续会从远程获取）
+        self.refreshFromRemote();
+    });
     ui.market_list.on('item_click', function(item) { self.showDetail(item); });
     ui.market_list.on('item_bind', function(itemView, itemHolder) {
         // 确保应用字体到图标
@@ -85,24 +103,68 @@ UIMarketView.prototype.loadData = function() {
     }
 };
 
+/**
+ * 从远程刷新任务列表
+ */
+UIMarketView.prototype.refreshFromRemote = function() {
+    var self = this;
+    var mgr = this.uiManager;
+
+    // TODO: 后续实现远程获取
+    // 目前先刷新本地数据
+    console.log('[MarketView] 刷新任务列表（远程功能待实现）');
+
+    // 异步执行，避免阻塞 UI
+    threads.start(function() {
+        try {
+            // TODO: 调用远程服务
+            // var remoteService = new RemoteMarketService();
+            // var synced = remoteService.syncToLocal(mgr.marketService);
+            // if (synced) {
+            //     ui.post(function() {
+            //         self.loadData();
+            //         toast('已更新任务列表');
+            //     });
+            // } else {
+            //     ui.post(function() {
+            //         toast('任务列表已是最新');
+            //     });
+            // }
+
+            // 暂时只刷新本地数据
+            ui.post(function() {
+                self.loadData();
+                toast('已刷新任务列表');
+            });
+
+        } catch (e) {
+            console.error('[MarketView] 刷新失败:', e.message);
+            ui.post(function() {
+                toast('刷新失败: ' + e.message);
+            });
+        }
+    });
+};
+
 UIMarketView.prototype.showDetail = function(marketTask) {
     var self = this;
     var mgr = this.uiManager;
 
+    // 获取完整任务数据（含 script 字段）
+    var fullTask = mgr.marketService.getTaskDetail(marketTask.id);
+    if (fullTask) marketTask = fullTask;
+
     // 代码默认展开
     var codeExpanded = true;
-
-    // 预处理脚本代码，转义单引号
-    var scriptText = marketTask.script || '暂无脚本';
-    scriptText = scriptText.replace(/\\/g, '\\\\').replace(/'/g, '\\\'');
 
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
-        '  <horizontal bg="' + C.primary + '" padding="20 16 16 16" gravity="center_vertical">' +
-        '    <text id="btn_back2" text="' + I.arrowLeft + '" textSize="24sp" textColor="#FFFFFF" padding="4 4 12 4"/>' +
-        '    <text text="任务详情" textSize="22sp" textColor="#FFFFFF" textStyle="bold" layout_weight="1"/>' +
-        '  </horizontal>' +
+        HeaderBuilder.buildHeader({
+            title: '任务详情',
+            leftIcon: I.arrowLeft,
+            leftIconId: 'btn_back2'
+        }) +
         '  <!-- 内容区域 -->' +
         '  <scroll bg="' + C.bg + '">' +
         '    <vertical padding="20">' +
@@ -121,24 +183,27 @@ UIMarketView.prototype.showDetail = function(marketTask) {
         '        <text text="' + marketTask.description + '" textSize="14sp" textColor="' + C.textPrimary + '"/>' +
         '      </vertical>' +
         '      <!-- 脚本代码预览 -->' +
-        '      <vertical id="code_card" bg="' + C.card + '" cornerRadius="20" padding="16" marginTop="16">' +
-        '        <horizontal id="code_header" gravity="center_vertical">' +
-        '          <text text="' + I.code + ' 任务脚本" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" layout_weight="1"/>' +
+        '      <vertical id="code_card" bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
+        '        <horizontal id="code_header" gravity="center_vertical" marginBottom="12">' +
+        '          <text text="任务脚本" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" layout_weight="1"/>' +
         '          <text id="code_toggle" text="' + I.arrowUp + '" textSize="20sp" textColor="' + C.textHint + '"/>' +
         '        </horizontal>' +
-        '        <vertical id="code_content" visibility="visible" marginTop="12">' +
-        '          <text id="code_text" text="' + scriptText + '" textSize="12sp" textColor="' + C.textPrimary + '" fontFamily="monospace" lineSpacingExtra="3"/>' +
+        '        <vertical id="code_content" visibility="visible">' +
+        '          <text id="code_text" textSize="12sp" textColor="' + C.textPrimary + '" fontFamily="monospace" lineSpacingExtra="3"/>' +
         '        </vertical>' +
         '      </vertical>' +
         '      <!-- 导入按钮 -->' +
-        '      <button id="btn_import_task" text="' + I.download + ' 导入任务" bg="' + C.primary + '" textColor="white" textSize="15sp" cornerRadius="16" h="52" marginTop="24" textStyle="bold"/>' +
+        '      <button id="btn_import_task" text="' + I.download + ' 导入任务" bg="' + C.primary + '" textColor="#FFFFFF" textSize="15sp" cornerRadius="16" h="52" marginTop="24" textStyle="bold"/>' +
         '    </vertical>' +
         '  </scroll>' +
         '</vertical>'
     );
 
-    ui.btn_back2.on('click', function() { self.show(); });
+    ui.btn_back2.on('click', function() { back(); });
     ui.btn_import_task.on('click', function() { mgr.dialogs.importMarketTask(marketTask); });
+
+    // 动态设置脚本内容（避免XML转义问题）
+    ui.code_text.setText(marketTask.script || '暂无脚本');
 
     // 代码展开/折叠切换
     ui.code_header.on('click', function() {

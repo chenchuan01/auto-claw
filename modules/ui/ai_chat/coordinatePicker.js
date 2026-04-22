@@ -3,7 +3,7 @@
  * 处理悬浮窗拾取坐标逻辑
  */
 
-var Config = require('../../config');
+var Config = require('../../core/config');
 
 /**
  * 启动坐标拾取
@@ -141,20 +141,24 @@ function insertCoordinateToInput(x, y, inputView, ui) {
     var screenHeight = device.height;
     var xRatio = (x / screenWidth).toFixed(4);
     var yRatio = (y / screenHeight).toFixed(4);
+    // 容错范围：屏幕宽高的 0.8%，约 6~8px（1080p 下约 8px），不超过 10px
+    var toleranceX = Math.min(10, Math.round(screenWidth * 0.008));
+    var toleranceY = Math.min(10, Math.round(screenHeight * 0.008));
 
     // 判断目标输入框是对话还是脚本，生成不同格式
     var insertion;
     if (inputView === ui.input_message) {
-        // 对话：自然语言描述给 AI 理解
-        insertion = '坐标点(' + xRatio + ', ' + yRatio + ')，也就是屏幕位置(' + x + ', ' + y + ')';
+        // 对话：自然语言描述给 AI 理解，包含比例和绝对坐标
+        insertion = '坐标点(xRatio=' + xRatio + ', yRatio=' + yRatio + ')，' +
+            '当前设备绝对坐标(' + x + ', ' + y + ')，屏幕尺寸' + screenWidth + 'x' + screenHeight;
     } else {
-        // 脚本：生成可执行代码
+        // 脚本：生成相对坐标点击代码，含容错偏移
         insertion =
             'var x = parseInt(device.width * ' + xRatio + ');\n' +
             'var y = parseInt(device.height * ' + yRatio + ');\n' +
-            '// 添加±2像素随机偏移增加容错\n' +
-            'x = x + random(-2, 2);\n' +
-            'y = y + random(-2, 2);\n' +
+            '// 随机偏移模拟真人点击，容错范围 ±' + toleranceX + 'px\n' +
+            'x = x + (Math.random() > 0.5 ? 1 : -1) * parseInt(Math.random() * ' + toleranceX + ');\n' +
+            'y = y + (Math.random() > 0.5 ? 1 : -1) * parseInt(Math.random() * ' + toleranceY + ');\n' +
             'click(x, y);';
     }
 
@@ -181,7 +185,7 @@ function insertCoordinateToInput(x, y, inputView, ui) {
         }
 
         if (inputView === ui.input_message) {
-            toast('坐标已插入到对话输入框: (' + x + ', ' + y + ')');
+            toast('坐标已插入对话框: (' + x + ', ' + y + ') → 比例(' + xRatio + ', ' + yRatio + ')');
             // 自动弹出输入法
             setTimeout(function() {
                 var imm = context.getSystemService(android.view.inputmethod.InputMethodManager);

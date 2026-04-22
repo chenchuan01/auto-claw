@@ -69,8 +69,8 @@
   "projectDirectory": "/storage/emulated/0/Scripts/AutoClaw",
   "scripts": {},
   "signingConfig": {
-    "alias": "cqyy",
-    "keystore": "/storage/emulated/0/Scripts/.keyStore/cqyy.keystore"
+    "alias": null,
+    "keystore": null
   },
   "sourcePath": "/storage/emulated/0/Scripts/AutoClaw/main.js",
   "versionCode": 1,

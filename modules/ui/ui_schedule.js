@@ -3,6 +3,7 @@
  */
 
 var Config = require('../core/config');
+var HeaderBuilder = require('./header_builder');
 var C = Config.colors;
 var I = Config.icons;
 
@@ -26,9 +27,9 @@ UISchedule.prototype.show = function(taskId) {
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <horizontal bg="' + C.primary + '" padding="16" gravity="center_vertical">' +
-        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="20sp" textColor="white" padding="8"/>' +
-        '    <text text="定时设置" textSize="18sp" textColor="white" layout_weight="1" marginLeft="8"/>' +
-        '    <text id="btn_save" text="' + I.check + '" textSize="20sp" textColor="white" padding="8"/>' +
+        '    <text id="btn_back" text="' + I.arrowLeft + '" textSize="20sp" textColor="#FFFFFF" padding="8"/>' +
+        '    <text text="定时设置" textSize="18sp" textColor="#FFFFFF" layout_weight="1" marginLeft="8"/>' +
+        '    <text id="btn_save" text="' + I.check + '" textSize="20sp" textColor="#FFFFFF" padding="8"/>' +
         '  </horizontal>' +
         '  <ScrollView>' +
         '    <vertical padding="16">' +
@@ -97,7 +98,7 @@ UISchedule.prototype.show = function(taskId) {
     ui.card_schedule_config.attr('alpha', schedule.enabled ? '1.0' : '0.5');
 
     ui.btn_back.on('click', function() {
-        self.uiManager.showMainView();
+        back();
     });
 
     ui.btn_time.on('click', function() {

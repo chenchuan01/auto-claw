@@ -3,7 +3,7 @@
  * 处理脚本预览、更新、运行、保存等功能
  */
 
-var Config = require('../../config');
+var Config = require('../../core/config');
 var I = Config.icons;
 
 /**
