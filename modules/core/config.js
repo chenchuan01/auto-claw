@@ -36,46 +36,48 @@ module.exports = {
 
     // Font Awesome 6 Solid 图标
     icons: {
-        play:        '\uf04b',  // 播放/执行
-        stop:        '\uf28d',  // 停止 (circle-stop)
-        xmark:       '\uf00d',  // 删除/关闭
-        trash:       '\uf1f8',  // 垃圾桶 (trash-can)
-        pen:         '\uf304',  // 编辑
-        arrowLeft:   '\uf060',  // 返回 (arrow-left)
-        download:    '\uf019',  // 下载/导入
-        upload:      '\uf093',  // 上传/导出
-        upload2:     '\uf0ee',  // 上传云 (cloud-arrow-up)
-        save:        '\uf0c7',  // 保存 (floppy-disk)
-        ellipsis:    '\uf141',  // 更多 (ellipsis)
-        bars:        '\uf0c9',  // 菜单/列表
-        code:        '\uf121',  // 代码
-        star:        '\uf005',  // 星级
-        user:        '\uf007',  // 用户/作者
-        refresh:     '\uf021',  // 刷新 (arrows-rotate)
-        plus:        '\u002b',  // 添加
-        clipboardList: '\uf328', // 剪贴板 (clipboard)
-        robot:       '\uf120',  // AI 机器人 (terminal)
-        comment:     '\uf075',  // 对话 (comment)
-        eye:         '\uf06e',  // 眼睛（显示密码）
-        eyeSlash:    '\uf070',  // 眼睛划线（隐藏密码）
-        magic:       '\uf0e7',  // 魔法棒（格式化）(bolt)
-        undo:        '\uf2ea',  // 撤销（重置）(rotate-left)
-        cloud:       '\uf0c2',  // 云（任务中心）
-        arrowUp:     '\uf062',  // 向上箭头
-        arrowDown:   '\uf063',  // 向下箭头
-        circle:      '\uf111',  // 圆
-        circleO:     '\uf111',  // 空心圆（同 circle）
-        check:       '\uf00c',  // 对勾
-        pause:       '\uf04c',  // 暂停
-        square:      '\uf0c8',  // 方块
-        cog:         '\uf013',  // 齿轮（设置）(gear)
-        spinner:     '\uf110',  // 加载中 (spinner)
-        clock:       '\uf017',  // 时钟
-        info:        '\uf05a',  // 信息 (circle-info)
-        calendar:    '\uf133',  // 日历
-        paperPlane:  '\uf1d8',  // 纸飞机（发送）(paper-plane)
-        crosshairs:  '\uf05b',  // 十字准星（坐标拾取）
-        target:      '\uf140',  // 目标 (bullseye)
+        play:        '',  // 播放/执行
+        stop:        '',  // 停止 (circle-stop)
+        xmark:       '',  // 删除/关闭
+        trash:       '',  // 垃圾桶 (trash-can)
+        pen:         '',  // 编辑
+        arrowLeft:   '',  // 返回 (arrow-left)
+        download:    '',  // 下载/导入
+        upload:      '',  // 上传/导出
+        upload2:     '',  // 上传云 (cloud-arrow-up)
+        save:        '',  // 保存 (floppy-disk)
+        ellipsis:    '',  // 更多 (ellipsis)
+        bars:        '',  // 菜单/列表
+        code:        '',  // 代码
+        star:        '',  // 星级
+        user:        '',  // 用户/作者
+        refresh:     '',  // 刷新 (arrows-rotate)
+        plus:        '+',  // 添加
+        clipboardList: '', // 剪贴板 (clipboard)
+        robot:       '',  // AI 机器人 (terminal)
+        comment:     '',  // 对话 (comment)
+        eye:         '',  // 眼睛（显示密码）
+        eyeSlash:    '',  // 眼睛划线（隐藏密码）
+        magic:       '',  // 魔法棒（格式化）(bolt)
+        undo:        '',  // 撤销（重置）(rotate-left)
+        cloud:       '',  // 云（任务中心）
+        arrowUp:     '',  // 向上箭头
+        arrowDown:   '',  // 向下箭头
+        circle:      '',  // 圆
+        circleO:     '',  // 空心圆（同 circle）
+        check:       '',  // 对勾
+        pause:       '',  // 暂停
+        square:      '',  // 方块
+        cog:         '',  // 齿轮（设置）(gear)
+        spinner:     '',  // 加载中 (spinner)
+        clock:       '',  // 时钟
+        info:        '',  // 信息 (circle-info)
+        calendar:    '',  // 日历
+        paperPlane:  '',  // 纸飞机（发送）(paper-plane)
+        crosshairs:  '',  // 十字准星（坐标拾取）
+        target:      '',  // 目标 (bullseye)
+        history:     '',  // 历史 (clock-rotate-left)
+        chip:        '',  // 芯片 (microchip) - AI 图标
     },
 
     // 状态映射
@@ -86,7 +88,7 @@ module.exports = {
         failed:  { text: '失败',   color: '#EF4444', dot: '●' },
         paused:  { text: '已暂停', color: '#9C27B0', dot: '●' }
     },
-    
+
     // 默认任务脚本
     defaultScript: '// AutoX 任务脚本\n' +
         'console.log("任务开始执行");\n' +
@@ -97,14 +99,14 @@ module.exports = {
         '// 示例：显示完成消息\n' +
         'toast("任务执行完成");\n' +
         'console.log("任务执行结束");',
-    
+
     // 市场API配置
     marketApi: {
         baseUrl: 'https://api.autoclaw.com',
         timeout: 10000,
         retryCount: 3
     },
-    
+
     // 应用设置
     settings: {
         autoBackup: true,

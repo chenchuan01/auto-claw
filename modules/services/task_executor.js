@@ -24,29 +24,64 @@ TaskExecutor.prototype.executeTask = function(taskId) {
         runCount: (task.runCount || 0) + 1
     });
 
-    this.taskLogs[taskId] = [];
+    // 如果日志不存在，初始化
+    if (!this.taskLogs[taskId]) {
+        this.taskLogs[taskId] = [];
+    }
+
+    // 添加分隔线，新执行日志和历史日志分开
+    if (this.taskLogs[taskId].length > 0) {
+        this.addTaskLog(taskId, '');
+        this.addTaskLog(taskId, '────────────────────────────────────');
+        var d = new Date();
+        var dateStr = d.getFullYear() + '-' +
+                    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(d.getDate()).padStart(2, '0') + ' ' +
+                    String(d.getHours()).padStart(2, '0') + ':' +
+                    String(d.getMinutes()).padStart(2, '0');
+        this.addTaskLog(taskId, '🔄 【新执行】' + dateStr);
+    }
+
+    var d = new Date();
+    var dateStr = d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0') + ' ' +
+                String(d.getHours()).padStart(2, '0') + ':' +
+                String(d.getMinutes()).padStart(2, '0');
     this.addTaskLog(taskId, '[START] 开始执行任务: ' + task.name);
-    this.addTaskLog(taskId, '[TIME] 开始时间: ' + new Date().toLocaleString());
+    this.addTaskLog(taskId, '[TIME] ' + dateStr);
 
     try {
-        var execution = engines.execScript(task.name, task.script, {
-            engineType: 'rhino'
+        // 使用 threads.start 直接在新线程执行脚本，这种方式更可靠
+        var thread = threads.start(function() {
+            try {
+                eval(task.script);
+            } catch (e) {
+                self.addTaskLog(taskId, '✕ 脚本执行异常: ' + e.message + ' @行 ' + e.lineNumber);
+            }
         });
-        var engine = execution.getEngine();
-        this.runningTasks[taskId] = engine;
+        this.runningTasks[taskId] = thread;
+
+        if (!thread || typeof thread.isAlive !== 'function') {
+            self.addTaskLog(taskId, '✕ 无法创建执行线程');
+            this.dataManager.updateTask(taskId, { status: 'failed' });
+            toast('无法创建执行线程');
+            return false;
+        }
 
         // 监控脚本完成
         threads.start(function() {
-            var exitCode = -1;
             try {
-                execution.waitFor();
-                exitCode = execution.getEngine().captureStackTrace();
+                // 使用轮询方式等待线程结束
+                while (thread.isAlive()) {
+                    sleep(100);
+                }
             } catch (e) {
                 // 等待过程中发生异常
-                self.addTaskLog(taskId, '✕ 执行异常: ' + e.message);
+                self.addTaskLog(taskId, '✕ 监控异常: ' + e.message);
             } finally {
                 // 不管怎样，都清理运行记录并更新状态
-                if (self.runningTasks[taskId] === engine) {
+                if (self.runningTasks[taskId] === thread) {
                     delete self.runningTasks[taskId];
                 }
                 var currentTask = self.dataManager.getTaskById(taskId);
@@ -54,11 +89,13 @@ TaskExecutor.prototype.executeTask = function(taskId) {
                     // 如果任务还在运行状态，说明它正常执行完成了
                     // 如果已经被停止，就保持停止状态
                     if (currentTask.status === 'running') {
-                        // 检查引擎是否真的执行成功
+                        // 检查线程是否真的执行成功
                         var isSuccess = true;
                         try {
-                            isSuccess = !execution.getEngine().isAlive();
-                        } catch(e) {}
+                            isSuccess = thread && thread.isAlive && !thread.isAlive();
+                        } catch(e) {
+                            isSuccess = true;
+                        }
                         self.dataManager.updateTask(taskId, {
                             status: isSuccess ? 'success' : 'failed'
                         });
@@ -69,7 +106,13 @@ TaskExecutor.prototype.executeTask = function(taskId) {
                         }
                     }
                 }
-                self.addTaskLog(taskId, '[END] 任务执行结束: ' + new Date().toLocaleString());
+                var d = new Date();
+                var dateStr = d.getFullYear() + '-' +
+                            String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(d.getDate()).padStart(2, '0') + ' ' +
+                            String(d.getHours()).padStart(2, '0') + ':' +
+                            String(d.getMinutes()).padStart(2, '0');
+                self.addTaskLog(taskId, '[END] 任务执行结束: ' + dateStr);
             }
         });
 
@@ -85,11 +128,11 @@ TaskExecutor.prototype.executeTask = function(taskId) {
 };
 
 TaskExecutor.prototype.stopTask = function(taskId) {
-    var engine = this.runningTasks[taskId];
-    if (!engine) { toast('任务未在运行'); return false; }
+    var thread = this.runningTasks[taskId];
+    if (!thread) { toast('任务未在运行'); return false; }
 
     try {
-        engine.forceStop();
+        thread.interrupt();
         delete this.runningTasks[taskId];
         this.dataManager.updateTask(taskId, { status: 'paused' });
         this.addTaskLog(taskId, '‖ 任务被手动停止');
@@ -148,7 +191,13 @@ TaskExecutor.prototype.stopAllTasks = function() {
 TaskExecutor.prototype.addTaskLog = function(taskId, message) {
     if (!this.taskLogs[taskId]) this.taskLogs[taskId] = [];
     var logs = this.taskLogs[taskId];
-    var timestamp = new Date().toLocaleTimeString();
+    var d = new Date();
+    var timestamp = d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0') + ' ' +
+                String(d.getHours()).padStart(2, '0') + ':' +
+                String(d.getMinutes()).padStart(2, '0') + ':' +
+                String(d.getSeconds()).padStart(2, '0');
     logs.push('[' + timestamp + '] ' + message);
     if (logs.length > 1000) logs.splice(0, 200);
 };

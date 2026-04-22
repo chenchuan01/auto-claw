@@ -116,7 +116,7 @@ function renderMessages(self) {
                         '<vertical>' +
                         '  <horizontal id="code_header" bg="' + BC.codeBlock.bgColor + '" cornerRadius="' + BC.codeBlock.radius + '" padding="' + BC.codeBlock.headerPadding + '" gravity="center_vertical" marginTop="6" marginBottom="4">' +
                         '    <text id="code_title" text="' + I.code + ' 代码 (' + lineCount + ' 行)" textSize="13sp" textColor="' + BC.codeBlock.textColor + '" layout_weight="1"/>' +
-                        '    <text id="code_toggle" text="' + I.arrowDown + '" textSize="16sp" textColor="' + C.textSecondary + '"/>' +
+                        '    <text id="code_toggle" text="' + I.arrowDown + '" textSize="16sp" textColor="' + BC.codeBlock.textColor + '"/>' +
                         '  </horizontal>' +
                         '  <vertical id="code_content" bg="' + BC.codeBlock.bgColor + '" cornerRadius="' + BC.codeBlock.radius + '" padding="' + BC.codeBlock.padding + '" visibility="visible">' +
                         '    <text id="code_text" textSize="' + BC.codeBlock.textSize + '" textColor="' + BC.codeBlock.textColor + '" textIsSelectable="true" gravity="left"/>' +
@@ -153,7 +153,10 @@ function renderMessages(self) {
 
         // 滚动到底部
         ui.post(function() {
-            ui.message_scroll.fullScroll(android.widget.ScrollView.FOCUS_DOWN);
+            var scrollView = ui.message_scroll;
+            if (scrollView) {
+                scrollView.fullScroll(android.widget.ScrollView.FOCUS_DOWN);
+            }
         }, 100);
     });
 }

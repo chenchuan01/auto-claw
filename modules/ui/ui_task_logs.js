@@ -45,8 +45,8 @@ UITaskLogs.prototype.show = function(taskId) {
             title: '任务日志',
             leftIcon: I.arrowLeft,
             leftIconId: 'btn_back',
-            rightIcon: I.clipboardList,
-            rightIconId: 'btn_copy'
+            rightIcon: I.trash,
+            rightIconId: 'btn_clear_logs'
         }) +
         '  <!-- 日志内容 -->' +
         '  <scroll bg="' + C.bg + '" layout_weight="1">' +
@@ -64,7 +64,7 @@ UITaskLogs.prototype.show = function(taskId) {
     );
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_copy, ui.btn_back);
+    mgr.fontManager.apply(ui.btn_back, ui.btn_clear_logs);
     if (hasError && ui.btn_copy_error) {
         mgr.fontManager.apply(ui.btn_copy_error);
     }
@@ -77,13 +77,14 @@ UITaskLogs.prototype.show = function(taskId) {
         back();
     });
 
-    ui.btn_copy.on('click', function() {
-        if (!logText || logText === '暂无日志') {
-            toast('暂无日志内容');
-            return;
-        }
-        setClip(logText);
-        toast('全部日志已复制到剪贴板');
+    ui.btn_clear_logs.on('click', function() {
+        dialogs.confirm('清空日志', '确定要清空这个任务的所有日志吗？', function(confirmed) {
+            if (confirmed) {
+                mgr.taskExecutor.clearTaskLogs(taskId);
+                toast('日志已清空');
+                self.show(taskId); // 刷新页面
+            }
+        });
     });
 
     if (hasError && ui.btn_copy_error) {

@@ -51,7 +51,7 @@ UIMainView.prototype.show = function() {
         '    </list>' +
         '    <!-- 空状态 -->' +
         '    <vertical id="empty_view" visibility="gone" gravity="center" bg="' + C.bg + '" padding="40">' +
-        '      <text text="' + I.clipboardList + '" textSize="88sp" textColor="' + C.textHint + '" gravity="center"/>' +
+        '      <text text="' + I.robot + '" textSize="88sp" textColor="' + C.primary + '" gravity="center"/>' +
         '    </vertical>' +
         '  </frame>' +
         mgr.buildBottomNav('tasks') +

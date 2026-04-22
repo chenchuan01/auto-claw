@@ -135,6 +135,16 @@ function saveAsTask(self) {
                 source: 'ai'
             });
 
+            // 同时保存当前对话到历史对话
+            if (self.messages && self.messages.length > 0) {
+                var currentScript = ui.script_editor.getText().toString();
+                mgr.dataManager.saveAIConversation({
+                    messages: self.messages,
+                    script: currentScript,
+                    title: name
+                });
+            }
+
             toast('任务已保存');
 
             // 询问是否查看任务

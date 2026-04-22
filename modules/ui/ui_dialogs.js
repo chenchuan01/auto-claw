@@ -53,12 +53,11 @@ UIDialogs.prototype.showTaskManagement = function(taskId) {
     var mgr = this.uiManager;
     var task = mgr.dataManager.getTaskById(taskId);
     if (!task) return;
-    var options = ['查看详情', '编辑脚本', '查看日志', '定时执行', '删除任务'];
+    var options = ['查看编辑脚本', '查看日志', '定时执行', '删除任务'];
     dialogs.select('任务管理', options, function(index) {
         if (index < 0) return;
         switch (options[index]) {
-            case '查看详情': mgr.showTaskDetail(taskId); break;
-            case '编辑脚本': mgr.showScriptEditor(taskId); break;
+            case '查看编辑脚本': mgr.showScriptEditor(taskId); break;
             case '查看日志': self.showTaskLogs(taskId); break;
             case '定时执行': mgr.showScheduleDialog(taskId); break;
             case '删除任务': self.confirmDeleteTask(taskId); break;

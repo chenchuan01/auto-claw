@@ -4,15 +4,15 @@
  */
 
 function CodeHighlighter() {
-    // 颜色配置
+    // 颜色配置 - 深色主题（VS Code Dark+ 风格）
     this.colors = {
-        keyword: '#CF222E',      // 关键字 - 红色
-        string: '#0A3069',       // 字符串 - 深蓝色
-        comment: '#6E7781',      // 注释 - 灰色
-        number: '#0550AE',       // 数字 - 蓝色
-        function: '#8250DF',     // 函数名 - 紫色
-        operator: '#CF222E',     // 操作符 - 红色
-        default: '#24292F'       // 默认文本 - 深灰色
+        keyword: '#569CD6',      // 关键字 - 浅蓝色
+        string: '#CE9178',       // 字符串 - 浅橙色
+        comment: '#6A9955',      // 注释 - 暗绿色
+        number: '#B5CEA8',       // 数字 - 浅绿色
+        function: '#DCDCAA',     // 函数名 - 浅黄色
+        operator: '#D4D4D4',     // 操作符 - 浅灰色
+        default: '#D4D4D4'       // 默认文本 - 浅灰色
     };
 
     // JavaScript 关键字

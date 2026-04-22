@@ -18,6 +18,9 @@ DataManager.prototype.initStorage = function() {
     if (!this.storage.get('settings')) {
         this.storage.put('settings', Config.settings);
     }
+    if (!this.storage.get('aiConversations')) {
+        this.storage.put('aiConversations', []);
+    }
 };
 
 DataManager.prototype.getTasks = function() {
@@ -217,6 +220,93 @@ DataManager.prototype.updateSettings = function(newSettings) {
     }
     this.storage.put('settings', updated);
     return updated;
+};
+
+/**
+ * 获取所有AI对话历史
+ */
+DataManager.prototype.getAIConversations = function() {
+    return this.storage.get('aiConversations') || [];
+};
+
+/**
+ * 保存AI对话到历史
+ */
+DataManager.prototype.saveAIConversation = function(conversation) {
+    var conversations = this.getAIConversations();
+
+    // 如果对话已有 id，则更新已有对话，不新增
+    if (conversation.id) {
+        conversations = conversations.map(function(c) {
+            if (c.id === conversation.id) {
+                // 更新内容
+                return {
+                    id: conversation.id,
+                    title: conversation.title || this.generateConversationTitle(conversation.messages),
+                    messages: conversation.messages,
+                    script: conversation.script || '',
+                    createTime: c.createTime,
+                    updateTime: Date.now()
+                };
+            }
+            return c;
+        }, this);
+        this.storage.put('aiConversations', conversations);
+        return conversation.id;
+    }
+
+    // 新增对话
+    conversations.unshift({
+        id: 'conv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10),
+        title: conversation.title || this.generateConversationTitle(conversation.messages),
+        messages: conversation.messages,
+        script: conversation.script || '',
+        createTime: Date.now()
+    });
+    // 只保留最近 50 条对话
+    if (conversations.length > 50) {
+        conversations = conversations.slice(0, 50);
+    }
+    this.storage.put('aiConversations', conversations);
+    return conversations[0].id;
+};
+
+/**
+ * 删除AI对话历史
+ */
+DataManager.prototype.deleteAIConversation = function(convId) {
+    var conversations = this.getAIConversations();
+    conversations = conversations.filter(function(c) {
+        return c.id !== convId;
+    });
+    this.storage.put('aiConversations', conversations);
+};
+
+/**
+ * 生成对话标题（从第一条用户消息截取）
+ */
+DataManager.prototype.generateConversationTitle = function(messages) {
+    if (!messages || messages.length === 0) return '新对话';
+    var firstUserMsg = messages.filter(function(m) {
+        return m.role === 'user';
+    })[0];
+    if (!firstUserMsg) return '新对话';
+    var title = firstUserMsg.content.substring(0, 30);
+    if (firstUserMsg.content.length > 30) title += '...';
+    return title;
+};
+
+/**
+ * 根据ID获取AI对话
+ */
+DataManager.prototype.getAIConversationById = function(convId) {
+    var conversations = this.getAIConversations();
+    for (var i = 0; i < conversations.length; i++) {
+        if (conversations[i].id === convId) {
+            return conversations[i];
+        }
+    }
+    return null;
 };
 
 module.exports = DataManager;

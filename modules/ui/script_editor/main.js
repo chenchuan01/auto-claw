@@ -59,11 +59,11 @@ UIScriptEditor.prototype.show = function(taskId) {
         '        <!-- 第一行：标题 -->' +
         '        <text text="任务脚本" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
         '        <!-- 第二行：快捷按钮 -->' +
-        '        <horizontal gravity="center_vertical">' +
-        '          <text id="btn_ai_edit" text="' + I.robot + ' AI编辑" textSize="13sp" textColor="' + C.primary + '" padding="6 12" bg="' + C.primary + '22" cornerRadius="8" marginRight="8"/>' +
-        '          <text id="btn_format" text="' + I.magic + ' 格式化" textSize="13sp" textColor="' + C.primary + '" padding="6 12" bg="' + C.primary + '22" cornerRadius="8" marginRight="8"/>' +
-        '          <text id="btn_snippets" text="' + I.clipboardList + ' 片段" textSize="13sp" textColor="' + C.primary + '" padding="6 12" bg="' + C.primary + '22" cornerRadius="8" marginRight="8"/>' +
-        '          <text id="btn_reset" text="' + I.undo + ' 重置" textSize="13sp" textColor="' + C.primary + '" padding="6 12" bg="' + C.primary + '22" cornerRadius="8"/>' +
+        '        <horizontal gravity="center_vertical" marginBottom="12">' +
+        '          <button id="btn_ai_edit" text="' + I.robot + '" w="48" h="48" marginRight="8" bg="' + C.primary + '" textColor="#FFFFFF" textSize="20sp" cornerRadius="12"/>' +
+        '          <button id="btn_format" text="' + I.magic + '" w="48" h="48" marginRight="8" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="20sp" cornerRadius="12"/>' +
+        '          <button id="btn_snippets" text="' + I.clipboardList + '" w="48" h="48" marginRight="8" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="20sp" cornerRadius="12"/>' +
+        '          <button id="btn_reset" text="' + I.undo + '" w="48" h="48" bg="' + C.warning + '" textColor="#FFFFFF" textSize="20sp" cornerRadius="12"/>' +
         '        </horizontal>' +
         '        <input id="script_input" hint="请输入任务脚本代码..." textSize="13sp" textColor="' + C.textPrimary + '" bg="' + C.surface + '" padding="16" cornerRadius="12" minLines="15" gravity="top" singleLine="false"/>' +
         '      </vertical>' +

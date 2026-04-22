@@ -14,6 +14,7 @@ var UIDialogs = require('./ui_dialogs');
 var UIScriptEditor = require('./script_editor/main');
 var UISettings = require('./ui_settings');
 var UIAIChat = require('./ai_chat/main');
+var UIAIHistory = require('./ui_ai_history');
 var UISchedule = require('./ui_schedule');
 var FontManager = require('../core/font_manager');
 var AIService = require('../ai/ai_service');
@@ -42,6 +43,7 @@ function UIManager(dataManager, taskExecutor, marketService, recorder) {
     this.scriptEditor = new UIScriptEditor(this);
     this.settingsView = new UISettings(this);
     this.aiChat = new UIAIChat(this);
+    this.aiHistory = new UIAIHistory(this);
     this.scheduleView = new UISchedule(this);
     this.scheduler = new Scheduler(dataManager, taskExecutor);
     this.scheduler.start();
@@ -152,6 +154,13 @@ UIManager.prototype.showAIChat = function() {
     this.setupBackHandler();
 };
 
+UIManager.prototype.showAIHistory = function() {
+    this.currentView = 'ai_history';
+    this.stopAutoRefresh();
+    this.aiHistory.show();
+    this.setupBackHandler();
+};
+
 UIManager.prototype.startAIEditWithScript = function(script, taskName, taskId) {
     this.currentView = 'ai_chat';
     this.stopAutoRefresh();
@@ -174,6 +183,9 @@ UIManager.prototype.setupBackHandler = function() {
         var view = self.currentView;
         if (view === 'main') {
             activity.finish();
+        } else if (view === 'ai_history') {
+            e.consumed = true;
+            self.showAIChat();
         } else {
             e.consumed = true;
             self.showMainView();
@@ -190,7 +202,7 @@ UIManager.prototype.buildBottomNav = function(activeTab) {
         '      <text text="任务列表" textSize="10sp" textColor="' + tasksColor + '" gravity="center" marginTop="4"/>' +
         '    </vertical>' +
         '    <vertical id="nav_btn_ai" layout_weight="1" gravity="center" padding="8 4">' +
-        '      <text id="nav_icon_ai" text="' + I.robot + '" w="56" h="56" bg="' + C.primary + '" textColor="#FFFFFF" textSize="26sp" gravity="center" cornerRadius="28" textStyle="bold"/>' +
+        '      <text id="nav_icon_ai" text="' + I.paperPlane + '" w="56" h="56" bg="' + C.primary + '" textColor="#FFFFFF" textSize="26sp" gravity="center" cornerRadius="28" textStyle="bold"/>' +
         '    </vertical>' +
         '    <vertical id="nav_btn_market" layout_weight="1" gravity="center" padding="12 8">' +
         '      <text id="nav_icon_market" text="' + I.cloud + '" textSize="20sp" textColor="' + marketColor + '" gravity="center"/>' +

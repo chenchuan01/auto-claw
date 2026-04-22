@@ -18,6 +18,7 @@ function UIAIChat(uiManager) {
     this.currentTab = 'chat'; // 'chat' 或 'script'
     this.markdownRenderer = new MarkdownRenderer();
     this.lastTempTaskId = null; // 最近一次临时运行的任务ID
+    this.currentConversationId = null; // 当前对话ID（如果是从历史加载的）
     // 坐标拾取相关
     this.coordinatePickerWindow = null;
     this.isPickingCoordinate = false;
@@ -46,7 +47,7 @@ UIAIChat.prototype.show = function() {
     layoutBuilder.bindEvents(self, mgr);
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
+    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_history, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
 
     // 显示欢迎消息
     if (self.messages.length === 0) {
@@ -63,6 +64,10 @@ UIAIChat.prototype.show = function() {
 UIAIChat.prototype.switchTab = function(tab) {
     this.currentTab = tab;
 
+    // 解析颜色
+    var colorWhite = android.graphics.Color.parseColor('#FFFFFF');
+    var colorGray = android.graphics.Color.parseColor(C.textHint);
+
     if (tab === 'chat') {
         ui.view_chat.attr('visibility', 'visible');
         ui.view_script.attr('visibility', 'gone');
@@ -70,12 +75,12 @@ UIAIChat.prototype.switchTab = function(tab) {
         ui.quick_bar.attr('visibility', 'visible');
 
         ui.tab_chat.attr('bg', C.primary);
-        ui.tab_chat_text.attr('textColor', 'white');
-        ui.tab_chat_text.attr('textStyle', 'bold');
+        ui.tab_chat_text.setTextColor(colorWhite);
+        ui.tab_chat_text.setTypeface(ui.tab_chat_text.getTypeface(), android.graphics.Typeface.BOLD);
 
         ui.tab_script.attr('bg', C.surface);
-        ui.tab_script_text.attr('textColor', C.textSecondary);
-        ui.tab_script_text.attr('textStyle', 'normal');
+        ui.tab_script_text.setTextColor(colorGray);
+        ui.tab_script_text.setTypeface(ui.tab_script_text.getTypeface(), android.graphics.Typeface.NORMAL);
     } else {
         ui.view_chat.attr('visibility', 'gone');
         ui.view_script.attr('visibility', 'visible');
@@ -83,12 +88,12 @@ UIAIChat.prototype.switchTab = function(tab) {
         ui.quick_bar.attr('visibility', 'gone');
 
         ui.tab_chat.attr('bg', C.surface);
-        ui.tab_chat_text.attr('textColor', C.textSecondary);
-        ui.tab_chat_text.attr('textStyle', 'normal');
+        ui.tab_chat_text.setTextColor(colorGray);
+        ui.tab_chat_text.setTypeface(ui.tab_chat_text.getTypeface(), android.graphics.Typeface.NORMAL);
 
         ui.tab_script.attr('bg', C.primary);
-        ui.tab_script_text.attr('textColor', 'white');
-        ui.tab_script_text.attr('textStyle', 'bold');
+        ui.tab_script_text.setTextColor(colorWhite);
+        ui.tab_script_text.setTypeface(ui.tab_script_text.getTypeface(), android.graphics.Typeface.BOLD);
 
         scriptOperations.updateScriptPreview(this);
     }
@@ -197,11 +202,13 @@ UIAIChat.prototype.showWithScript = function(script, taskName, currentTaskId) {
     this.messages = [];
     this.currentTab = 'script';  // 默认显示脚本tab
 
-    layoutBuilder.buildLayoutWithEdit(taskName);
-    layoutBuilder.bindEventsWithEdit(self, mgr);
+    // 使用统一布局，仅标题自定义
+    var pageTitle = taskName ? ('AI 编辑: ' + taskName) : 'AI 助手';
+    layoutBuilder.buildLayout(pageTitle);
+    layoutBuilder.bindEvents(self, mgr);
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
+    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_history, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
 
     // 添加初始提示消息，包含要编辑的脚本
     var prompt = '请帮我优化/修改这个脚本：\n\n```javascript\n' + script + '\n```';
@@ -209,21 +216,19 @@ UIAIChat.prototype.showWithScript = function(script, taskName, currentTaskId) {
 
     // 脚本已经在输入框
     ui.script_editor.setText(script);
+    if (taskName) {
+        ui.script_title.setText(taskName);
+    }
     scriptOperations.updateScriptPreview(this);
     scriptOperations.updateLineNumbers();
 
     // 切换到脚本tab显示
     ui.post(function() {
-        ui.view_chat.attr('visibility', 'gone');
-        ui.view_script.attr('visibility', 'visible');
-        ui.input_area.attr('visibility', 'gone');
-        ui.quick_bar.attr('visibility', 'gone');
-        ui.tab_chat.attr('bg', C.surface);
-        ui.tab_script.attr('bg', C.primary);
-        ui.tab_chat_text.attr('textColor', C.textSecondary);
-        ui.tab_chat_text.attr('textStyle', 'normal');
-        ui.tab_script_text.attr('textColor', 'white');
-        ui.tab_script_text.attr('textStyle', 'bold');
+        self.switchTab('script');
+        // 自动发送请求给AI进行编辑
+        ui.post(function() {
+            self.sendMessage();
+        }, 500);
     });
 };
 
@@ -234,6 +239,56 @@ UIAIChat.prototype.addWelcomeMessage = function() {
 
 UIAIChat.prototype.renderMessages = function() {
     messageRenderer.renderMessages(this);
+};
+
+/**
+ * 保存当前对话到历史
+ */
+UIAIChat.prototype.saveCurrentConversationToHistory = function() {
+    var mgr = this.uiManager;
+    if (this.messages.length === 0) return;
+
+    // 获取当前脚本内容
+    var currentScript = '';
+    if (ui.script_editor) {
+        currentScript = ui.script_editor.getText().toString();
+    }
+
+    // 如果已经有 conversationId，更新而不是新建
+    var data = {
+        id: this.currentConversationId,
+        messages: this.messages,
+        script: currentScript,
+        title: null // 自动生成
+    };
+
+    mgr.dataManager.saveAIConversation(data);
+};
+
+/**
+ * 加载历史对话到当前界面
+ */
+UIAIChat.prototype.loadConversation = function(conv) {
+    var self = this;
+    // 先保存当前对话（如果有内容）
+    if (this.messages.length > 0) {
+        this.saveCurrentConversationToHistory();
+    }
+
+    // 加载对话数据
+    this.currentConversationId = conv.id;
+    this.messages = JSON.parse(JSON.stringify(conv.messages));
+
+    // 如果有保存的脚本，恢复它
+    if (conv.script && ui.script_editor) {
+        ui.script_editor.setText(conv.script);
+        scriptOperations.updateScriptPreview(this);
+        scriptOperations.updateLineNumbers();
+    }
+
+    // 重新渲染消息
+    messageRenderer.renderMessages(this);
+    toast('已加载历史对话');
 };
 
 module.exports = UIAIChat;

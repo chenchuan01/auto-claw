@@ -42,13 +42,13 @@ var MESSAGE_BUBBLE_CONFIG = {
     lineSpacing: '4',
     textGravity: 'left',  // 文本在气泡内居左
 
-    // 代码块样式
+    // 代码块样式 - 深色主题
     codeBlock: {
-        bgColor: C.surface,
-        textColor: C.textPrimary,
+        bgColor: '#1E1E1E',
+        textColor: '#D4D4D4',
         textSize: '12sp',
         radius: '8',
-        padding: '10',
+        padding: '12 10',
         headerPadding: '8 10'
     }
 };

@@ -22,19 +22,18 @@ function startCoordinatePicker(self, callback) {
 
     // 在新线程创建悬浮窗
     threads.start(function() {
-        // 布局：全屏背景 + 可拖动的十字准星
+        // 全屏透明背景，不拦截触摸，只有十字准星可拖动
         var window = floaty.window(
-            '<frame id="root" bg="#00000001" w="' + device.width + 'px" h="' + device.height + 'px">' +
+            '<frame id="root" bg="#00000000" w="' + device.width + 'px" h="' + device.height + 'px">' +
             '  <frame id="crosshair" w="wrap_content" h="wrap_content" ' +
-            '    layout_marginLeft="' + Math.floor((device.width - 48) / 2) + 'px" ' +
-            '    layout_marginTop="' + Math.floor((device.height - 48) / 2) + 'px">' +
-            '    <frame w="48" h="48" gravity="center">' +
-            '      <text text="" w="48" h="48" bg="#00000088" gravity="center" cornerRadius="24"/>' +
-            '      <text text="" bg="#FF0000AA" h="2" w="40" gravity="center"/>' +
-            '      <text text="" bg="#FF0000AA" w="2" h="40" gravity="center"/>' +
-            '      <text text="" w="4" h="4" bg="#FF0000AA" gravity="center" cornerRadius="2"/>' +
+            '    layout_marginLeft="' + Math.floor((device.width - 64) / 2) + 'px" ' +
+            '    layout_marginTop="' + Math.floor((device.height - 64) / 2) + 'px">' +
+            '    <frame w="64" h="64" gravity="center">' +
+            '      <!-- 透明背景，只显示十字 -->' +
+            '      <text text="" w="64" h="64" bg="#00000088" gravity="center" cornerRadius="32"/>' +
+            '      <text text="" bg="#FF0000" h="2" w="50" gravity="center"/>' +
+            '      <text text="" bg="#FF0000" w="2" h="50" gravity="center"/>' +
             '    </frame>' +
-            '    <text text="点击拾取" textSize="9sp" textColor="#FFFFFF" bg="#80000000" padding="2 1" gravity="center" cornerRadius="3" marginTop="1"/>' +
             '  </frame>' +
             '</frame>'
         );
@@ -44,15 +43,15 @@ function startCoordinatePicker(self, callback) {
         var crosshair = window.crosshair;
 
         // 记录准星当前位置
-        var currentX = Math.floor((device.width - 48) / 2);
-        var currentY = Math.floor((device.height - 48) / 2);
+        var currentX = Math.floor((device.width - 64) / 2);
+        var currentY = Math.floor((device.height - 64) / 2);
         var lastRawX = 0;
         var lastRawY = 0;
 
         console.log('[coord-picker] init currentX=' + currentX + ' currentY=' + currentY + ' screen=' + device.width + 'x' + device.height);
 
-        // 全屏触摸监听 - 整个屏幕都可以拖动
-        root.setOnTouchListener(function(view, event) {
+        // 只让十字准星响应触摸，背景完全不拦截
+        crosshair.setOnTouchListener(function(view, event) {
             var action = event.getAction();
             var rawX = event.getRawX();
             var rawY = event.getRawY();
@@ -61,35 +60,32 @@ function startCoordinatePicker(self, callback) {
                 lastRawX = rawX;
                 lastRawY = rawY;
                 self.dragging = false;
-                console.log('[coord-picker] DOWN at ' + rawX + ',' + rawY);
                 return true;
             } else if (action == android.view.MotionEvent.ACTION_MOVE) {
                 var dx = rawX - lastRawX;
                 var dy = rawY - lastRawY;
-                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
                     self.dragging = true;
                 }
                 // 更新准星位置
                 currentX += dx;
                 currentY += dy;
                 // 限制在屏幕范围内
-                currentX = Math.max(0, Math.min(currentX, device.width - 48));
-                currentY = Math.max(0, Math.min(currentY, device.height - 48));
+                currentX = Math.max(0, Math.min(currentX, device.width - 64));
+                currentY = Math.max(0, Math.min(currentY, device.height - 64));
                 // 设置margin来移动准星
                 var lp = crosshair.getLayoutParams();
                 lp.leftMargin = currentX;
                 lp.topMargin = currentY;
                 crosshair.setLayoutParams(lp);
-                console.log('[coord-picker] MOVE to ' + currentX + ',' + currentY);
                 lastRawX = rawX;
                 lastRawY = rawY;
                 return true;
             } else if (action == android.view.MotionEvent.ACTION_UP) {
-                console.log('[coord-picker] UP dragging=' + self.dragging);
                 if (!self.dragging) {
                     // 点击拾取：计算中心点坐标
-                    var centerX = currentX + 24; // 24 = 48/2
-                    var centerY = currentY + 24;
+                    var centerX = currentX + 32; // 32 = 64/2
+                    var centerY = currentY + 32;
                     console.log('[coord-picker] PICK at ' + centerX + ',' + centerY);
                     // 调用回调
                     ui.run(function() {
@@ -102,14 +98,18 @@ function startCoordinatePicker(self, callback) {
             return false;
         });
 
+        // 关键设置：
+        // 1. 窗口可触摸，但只在准星区域拦截
+        // 2. 允许穿透，让下面的应用接收触摸事件
         window.setTouchable(true);
         window.setFocusable(false);
-        // 窗口固定位置，不移动，只移动准星
+        window.setInterceptTouchEvent(false);
+        // 窗口固定位置，不移动
         window.setPosition(0, 0);
         self.coordinatePickerWindow = window;
 
         ui.run(function() {
-            toast('按住拖动到目标位置，松开点击拾取坐标');
+            toast('拖动十字准星到目标位置，点击准星完成拾取');
         });
     });
 }
@@ -149,7 +149,7 @@ function insertCoordinateToInput(x, y, inputView, ui) {
     var insertion;
     if (inputView === ui.input_message) {
         // 对话：自然语言描述给 AI 理解，包含比例和绝对坐标
-        insertion = '坐标点(xRatio=' + xRatio + ', yRatio=' + yRatio + ')，' +
+        insertion = '坐标点(xRatio=' + xRatio + ', yRatio=' + yRatio + '),' +
             '当前设备绝对坐标(' + x + ', ' + y + ')，屏幕尺寸' + screenWidth + 'x' + screenHeight;
     } else {
         // 脚本：生成相对坐标点击代码，含容错偏移

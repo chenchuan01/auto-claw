@@ -47,7 +47,7 @@ UISettings.prototype.show = function() {
         '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
         '        <text text="消息格式" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
         '        ' +
-        '        <horizontal id="radio_openai" padding="12" bg="' + (aiConfig.messageFormat === 'openai' ? C.primary + '22' : '#00000000') + '" cornerRadius="12" marginBottom="12">' +
+        '        <horizontal id="radio_openai" padding="12" bg="' + (aiConfig.messageFormat === 'openai' ? C.primary + '33' : '#00000000') + '" cornerRadius="12" marginBottom="12">' +
         '          <text id="icon_openai" text="' + (aiConfig.messageFormat === 'openai' ? '●' : '○') + '" textSize="20sp" textColor="' + C.primary + '" marginRight="12"/>' +
         '          <vertical layout_weight="1">' +
         '            <text text="OpenAI 格式" textSize="16sp" textColor="' + C.textPrimary + '" textStyle="bold"/>' +
@@ -55,7 +55,7 @@ UISettings.prototype.show = function() {
         '          </vertical>' +
         '        </horizontal>' +
         '        ' +
-        '        <horizontal id="radio_anthropic" padding="12" bg="' + (aiConfig.messageFormat === 'anthropic' ? C.primary + '22' : '#00000000') + '" cornerRadius="12">' +
+        '        <horizontal id="radio_anthropic" padding="12" bg="' + (aiConfig.messageFormat === 'anthropic' ? C.primary + '33' : '#00000000') + '" cornerRadius="12">' +
         '          <text id="icon_anthropic" text="' + (aiConfig.messageFormat === 'anthropic' ? '●' : '○') + '" textSize="20sp" textColor="' + C.primary + '" marginRight="12"/>' +
         '          <vertical layout_weight="1">' +
         '            <text text="Anthropic 格式" textSize="16sp" textColor="' + C.textPrimary + '" textStyle="bold"/>' +
@@ -100,7 +100,7 @@ UISettings.prototype.show = function() {
         selectedFormat = 'openai';
         ui.icon_openai.setText('●');
         ui.icon_anthropic.setText('○');
-        ui.radio_openai.attr('bg', C.primary + '22');
+        ui.radio_openai.attr('bg', C.primary + '33');
         ui.radio_anthropic.attr('bg', '#00000000');
     });
 
@@ -109,7 +109,7 @@ UISettings.prototype.show = function() {
         ui.icon_openai.setText('○');
         ui.icon_anthropic.setText('●');
         ui.radio_openai.attr('bg', '#00000000');
-        ui.radio_anthropic.attr('bg', C.primary + '22');
+        ui.radio_anthropic.attr('bg', C.primary + '33');
     });
 };
 
