@@ -43,6 +43,9 @@ function startCoordinatePicker(self, callback) {
         var lastRawX = 0;
         var lastRawY = 0;
 
+        // 创建后立即设置初始位置到屏幕中心
+        window.setPosition(currentX, currentY);
+
         console.log('[coord-picker] init at ' + currentX + ',' + currentY + ' screen=' + device.width + 'x' + device.height);
 
         // 准星本身响应触摸拖动
@@ -52,9 +55,13 @@ function startCoordinatePicker(self, callback) {
             var rawY = event.getRawY();
 
             if (action == android.view.MotionEvent.ACTION_DOWN) {
+                // 按下时同步当前实际窗口位置，解决初始位置错位问题
+                currentX = window.getX();
+                currentY = window.getY();
                 lastRawX = rawX;
                 lastRawY = rawY;
                 self.dragging = false;
+                console.log('[coord-picker] DOWN at raw ' + rawX + ',' + rawY + ' window ' + currentX + ',' + currentY);
                 return true;
             } else if (action == android.view.MotionEvent.ACTION_MOVE) {
                 var dx = rawX - lastRawX;
@@ -93,7 +100,6 @@ function startCoordinatePicker(self, callback) {
         // 其他区域本来就不在悬浮窗上，自然能接收触摸
         window.setTouchable(true);
         window.setFocusable(false);
-        window.setPosition(startX, startY);
         // 确保不抢焦点
         var attrs = window.getWindow().getAttributes();
         attrs.flags |= android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
