@@ -98,6 +98,12 @@ function startCoordinatePicker(self, callback) {
             return false;
         });
 
+        // 根布局：非准星区域触摸返回false，让事件穿透到底层
+        root.setOnTouchListener(function(view, event) {
+            // 返回false表示不消费此事件，让它传递给下层应用
+            return false;
+        });
+
         // 关键设置：
         // 1. 窗口可触摸，但只在准星区域拦截
         // 2. 允许穿透，让下面的应用接收触摸事件
@@ -106,6 +112,10 @@ function startCoordinatePicker(self, callback) {
         window.setInterceptTouchEvent(false);
         // 窗口固定位置，不移动
         window.setPosition(0, 0);
+        // 添加穿透标志
+        var lp = window.getWindow().getAttributes();
+        lp.flags |= android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        window.getWindow().setAttributes(lp);
         self.coordinatePickerWindow = window;
 
         ui.run(function() {
