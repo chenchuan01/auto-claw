@@ -51,7 +51,7 @@ UIMarketView.prototype.show = function() {
     );
 
     this.loadData();
-    mgr.fontManager.apply(ui.btn_back, ui.btn_refresh);
+    mgr.fontManager.applyLight(ui.btn_back, ui.btn_refresh);
     ui.btn_back.on('click', function() { back(); });
     ui.btn_refresh.on('click', function() {
         // 旋转动画
@@ -219,7 +219,8 @@ UIMarketView.prototype.showDetail = function(marketTask) {
     });
 
     // 为作者、下载数和星级图标应用字体
-    mgr.fontManager.apply(ui.btn_back2, ui.btn_import_task, ui.detail_author, ui.detail_downloads, ui.detail_rating, ui.code_header, ui.code_toggle);
+    mgr.fontManager.applyLight(ui.btn_back2, ui.btn_import_task);
+    mgr.fontManager.apply(ui.detail_author, ui.detail_downloads, ui.detail_rating, ui.code_header, ui.code_toggle);
 };
 
 module.exports = UIMarketView;

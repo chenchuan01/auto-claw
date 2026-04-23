@@ -69,9 +69,22 @@ UIManager.prototype.setStatusBarColor = function() {
 
 UIManager.prototype.showMainView = function() {
     this.currentView = 'main';
+    this.resetStaleRunningTasks();
     this.mainView.show();
     this.startAutoRefresh();
     this.setupBackHandler();
+};
+
+// 软件启动时重置所有任务状态为待执行
+UIManager.prototype.resetStaleRunningTasks = function() {
+    var self = this;
+    var tasks = this.dataManager.getTasks();
+    tasks.forEach(function(task) {
+        // 将所有非 idle 状态重置为 idle
+        if (task.status !== 'idle') {
+            self.dataManager.updateTask(task.id, { status: 'idle' });
+        }
+    });
 };
 
 UIManager.prototype.startAutoRefresh = function() {
@@ -118,7 +131,12 @@ UIManager.prototype.showScriptEditor = function(taskId) {
 
 UIManager.prototype.executeTask = function(taskId) {
     var self = this;
-    var success = this.taskExecutor.executeTask(taskId);
+    var success = this.taskExecutor.executeTask(taskId, function(completedTaskId) {
+        // 任务完成回调，立即刷新 UI
+        if (self.currentView === 'main') {
+            self.mainView.loadData();
+        }
+    });
     if (success) {
         setTimeout(function() {
             if (self.currentView === 'main') {
@@ -129,7 +147,13 @@ UIManager.prototype.executeTask = function(taskId) {
 };
 
 UIManager.prototype.stopTask = function(taskId) {
+    var self = this;
     this.taskExecutor.stopTask(taskId);
+    setTimeout(function() {
+        if (self.currentView === 'main') {
+            self.mainView.loadData();
+        }
+    }, 300);
 };
 
 UIManager.prototype.showScheduleDialog = function(taskId) {

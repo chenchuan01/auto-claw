@@ -110,7 +110,8 @@ UITaskDetail.prototype.show = function(taskId) {
     ui.script_preview.setText(task.script || '暂无脚本');
 
     // 应用 Font Awesome 字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_edit, ui.btn_run_now, ui.btn_logs, ui.btn_delete, ui.task_run_count, ui.task_author);
+    mgr.fontManager.applyLight(ui.btn_back, ui.btn_edit);
+    mgr.fontManager.apply(ui.btn_run_now, ui.btn_logs, ui.btn_delete, ui.task_run_count, ui.task_author);
 
     // 轮询更新按钮状态
     self.pollInterval = setInterval(function() {

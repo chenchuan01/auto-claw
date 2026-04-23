@@ -123,7 +123,45 @@ function saveAsTask(self) {
         return;
     }
 
-    // 弹出对话框输入任务名称和描述
+    // 如果是从已有任务触发的AI编辑，直接更新该任务
+    if (self.currentTaskId) {
+        var task = mgr.dataManager.getTaskById(self.currentTaskId);
+        if (task) {
+            dialogs.confirm('更新任务', '确定要将AI生成的脚本保存到任务"' + task.name + '"吗？', function(confirmed) {
+                if (!confirmed) {
+                    toast('已取消');
+                    return;
+                }
+
+                // 更新任务脚本
+                mgr.dataManager.updateTask(self.currentTaskId, {
+                    script: code
+                });
+
+                // 同时保存当前对话到历史对话
+                if (self.messages && self.messages.length > 0) {
+                    var currentScript = ui.script_editor.getText().toString();
+                    mgr.dataManager.saveAIConversation({
+                        messages: self.messages,
+                        script: currentScript,
+                        title: task.name
+                    });
+                }
+
+                toast('任务已更新');
+
+                // 询问是否查看任务
+                dialogs.confirm('保存成功', '任务"' + task.name + '"已更新，是否查看任务详情？', function(confirmed) {
+                    if (confirmed) {
+                        mgr.showScriptEditor(self.currentTaskId);
+                    }
+                });
+            });
+            return;
+        }
+    }
+
+    // 否则创建新任务
     dialogs.rawInput('任务名称', '', function(name) {
         if (!name) {
             toast('已取消');

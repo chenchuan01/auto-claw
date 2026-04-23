@@ -112,14 +112,17 @@ function renderMessages(self) {
                     contentContainer.addView(textView);
                 } else if (block.type === 'code') {
                     var lineCount = block.content.split('\n').length;
+                    var codeBg = '#F0F4F8';
+                    var codeHeaderBg = '#E2E8F0';
+                    var codeFg = '#1A1A2E';
                     var codeBlock = ui.inflate(
                         '<vertical>' +
-                        '  <horizontal id="code_header" bg="' + BC.codeBlock.bgColor + '" cornerRadius="' + BC.codeBlock.radius + '" padding="' + BC.codeBlock.headerPadding + '" gravity="center_vertical" marginTop="6" marginBottom="4">' +
-                        '    <text id="code_title" text="' + I.code + ' 代码 (' + lineCount + ' 行)" textSize="13sp" textColor="' + BC.codeBlock.textColor + '" layout_weight="1"/>' +
-                        '    <text id="code_toggle" text="' + I.arrowDown + '" textSize="16sp" textColor="' + BC.codeBlock.textColor + '"/>' +
+                        '  <horizontal id="code_header" bg="' + codeHeaderBg + '" cornerRadius="8" padding="8 10" gravity="center_vertical" marginTop="6" marginBottom="0">' +
+                        '    <text id="code_title" text="' + I.code + ' 代码 (' + lineCount + ' 行)" textSize="13sp" textColor="' + codeFg + '" layout_weight="1"/>' +
+                        '    <text id="code_toggle" text="' + I.arrowDown + '" textSize="16sp" textColor="' + codeFg + '"/>' +
                         '  </horizontal>' +
-                        '  <vertical id="code_content" bg="' + BC.codeBlock.bgColor + '" cornerRadius="' + BC.codeBlock.radius + '" padding="' + BC.codeBlock.padding + '" visibility="visible">' +
-                        '    <text id="code_text" textSize="' + BC.codeBlock.textSize + '" textColor="' + BC.codeBlock.textColor + '" textIsSelectable="true" gravity="left"/>' +
+                        '  <vertical id="code_content" bg="' + codeBg + '" cornerRadius="0 0 8 8" padding="12 10" visibility="visible">' +
+                        '    <text id="code_text" textSize="12sp" textColor="' + codeFg + '" textIsSelectable="true" gravity="left"/>' +
                         '  </vertical>' +
                         '</vertical>'
                     );

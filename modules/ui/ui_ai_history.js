@@ -47,7 +47,8 @@ UIAIHistory.prototype.show = function() {
     );
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.empty_view.getChildAt(0));
+    mgr.fontManager.applyLight(ui.btn_back);
+    mgr.fontManager.apply(ui.empty_view.getChildAt(0));
 
     // 绑定返回事件
     ui.btn_back.on('click', function() {

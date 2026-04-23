@@ -46,8 +46,12 @@ UIAIChat.prototype.show = function() {
     layoutBuilder.buildLayout();
     layoutBuilder.bindEvents(self, mgr);
 
+    // 普通入口清空任务关联，保存时创建新任务
+    self.currentTaskId = null;
+
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_history, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
+    mgr.fontManager.applyLight(ui.btn_back, ui.btn_new_chat, ui.btn_history);
+    mgr.fontManager.apply(ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
 
     // 显示欢迎消息
     if (self.messages.length === 0) {
@@ -56,6 +60,13 @@ UIAIChat.prototype.show = function() {
         messageRenderer.renderMessages(self);
         scriptOperations.updateScriptPreview(self);
     }
+
+    // 默认聚焦输入框
+    ui.post(function() {
+        ui.input_message.requestFocus();
+        var imm = context.getSystemService(android.view.inputmethod.InputMethodManager);
+        imm.showSoftInput(ui.input_message, 0);
+    }, 300);
 };
 
 /**
@@ -200,7 +211,7 @@ UIAIChat.prototype.showWithScript = function(script, taskName, currentTaskId) {
     }
 
     this.messages = [];
-    this.currentTab = 'script';  // 默认显示脚本tab
+    this.currentTab = 'chat';  // 默认显示对话tab
 
     // 使用统一布局，仅标题自定义
     var pageTitle = taskName ? ('AI 编辑: ' + taskName) : 'AI 助手';
@@ -208,7 +219,8 @@ UIAIChat.prototype.showWithScript = function(script, taskName, currentTaskId) {
     layoutBuilder.bindEvents(self, mgr);
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_new_chat, ui.btn_history, ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
+    mgr.fontManager.applyLight(ui.btn_back, ui.btn_new_chat, ui.btn_history);
+    mgr.fontManager.apply(ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
 
     // 添加初始提示消息，包含要编辑的脚本
     var prompt = '请帮我优化/修改这个脚本：\n\n```javascript\n' + script + '\n```';
@@ -222,12 +234,27 @@ UIAIChat.prototype.showWithScript = function(script, taskName, currentTaskId) {
     scriptOperations.updateScriptPreview(this);
     scriptOperations.updateLineNumbers();
 
-    // 切换到脚本tab显示
+    // 默认停留在对话tab，自动发送AI请求
     ui.post(function() {
-        self.switchTab('script');
+        self.switchTab('chat');
         // 自动发送请求给AI进行编辑
         ui.post(function() {
-            self.sendMessage();
+            // 添加加载提示
+            self.addMessage('assistant', '正在思考...');
+
+            // 发送到 AI
+            mgr.aiService.sendMessage(self.messages.slice(0, -1), function(error, response) {
+                // 移除加载提示
+                self.messages.pop();
+
+                if (error) {
+                    self.addMessage('assistant', '抱歉，发生错误：' + error);
+                } else {
+                    self.addMessage('assistant', response);
+                    // 更新脚本预览
+                    scriptOperations.updateScriptPreview(self);
+                }
+            });
         }, 500);
     });
 };

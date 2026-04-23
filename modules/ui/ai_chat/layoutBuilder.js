@@ -6,6 +6,7 @@
 var Config = require('../../core/config');
 var HeaderBuilder = require('../header_builder');
 var scriptOperations = require('./scriptOperations');
+var highlightedEditor = require('./highlightedEditor');
 var C = Config.colors;
 var I = Config.icons;
 
@@ -53,9 +54,9 @@ function buildLayout(title) {
         '        <text id="btn_clear_script" text="' + I.trash + '" textSize="16sp" textColor="#FFFFFF" bg="' + C.error + '" w="36" h="36" gravity="center" cornerRadius="18"/>' +
         '      </horizontal>' +
         '      <!-- 编辑区域 -->' +
-        '      <horizontal bg="' + C.surface + '" cornerRadius="0 0 12 12" layout_weight="1">' +
+        '      <horizontal bg="#F0F4F8" cornerRadius="0 0 12 12" layout_weight="1">' +
         '        <!-- 行号 -->' +
-        '        <scroll id="line_number_scroll" w="40" bg="#E8EDF5">' +
+        '        <scroll id="line_number_scroll" w="40" bg="#E2E8F0">' +
         '          <vertical id="line_numbers" padding="12 12 4 12">' +
         '            <text id="line_number_text" text="1" textSize="12sp" textColor="' + C.textHint + '" gravity="right" lineSpacingExtra="2"/>' +
         '          </vertical>' +
@@ -191,6 +192,11 @@ function bindEvents(self, mgr) {
             scriptOperations.updateLineNumbers();
         }
     });
+
+    // 为脚本编辑器启用实时代码高亮
+    ui.post(function() {
+        highlightedEditor.setupHighlightedEditor(ui.script_editor);
+    }, 100);
 
     ui.input_message.on('key', function(keyCode, event) {
         if (keyCode === android.view.KeyEvent.KEYCODE_ENTER && !event.isShiftPressed()) {

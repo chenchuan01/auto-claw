@@ -32,6 +32,12 @@ UIScriptEditor.prototype.show = function(taskId) {
 
     var statusInfo = Config.statusMap[task.status] || Config.statusMap.idle;
 
+    // 计算定时信息
+    var scheduleText = '';
+    if (task.schedule && task.schedule.enabled && task.schedule.time) {
+        scheduleText = self.calcNextRunText(task.schedule);
+    }
+
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
@@ -47,12 +53,13 @@ UIScriptEditor.prototype.show = function(taskId) {
         '    <vertical padding="20">' +
         '      <!-- 任务信息卡片 -->' +
         '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24">' +
-        '        <text text="' + task.name + '" textSize="22sp" textColor="' + C.textPrimary + '" textStyle="bold"/>' +
-        '        <text text="' + (task.description || '暂无描述') + '" textSize="14sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
-        '        <horizontal marginTop="18" gravity="center_vertical">' +
-        '          <text text="' + statusInfo.text + '" textSize="13sp" textColor="#FFFFFF" bg="' + statusInfo.color + '" padding="6 14" cornerRadius="20" textStyle="bold"/>' +
-        '          <text id="task_run_count" text="' + I.play + ' 执行 ' + (task.runCount || 0) + ' 次" textSize="13sp" textColor="' + C.textHint + '" layout_weight="1" gravity="right"/>' +
+        '        <horizontal gravity="center_vertical">' +
+        '          <text text="' + task.name + '" textSize="22sp" textColor="' + C.textPrimary + '" textStyle="bold" layout_weight="1"/>' +
+        (scheduleText ? '          <text id="schedule_text" text="' + I.clock + ' ' + scheduleText + '" textSize="12sp" textColor="' + C.primary + '" marginRight="10" textStyle="bold"/>' : '') +
+        '          <text text="' + statusInfo.text + '" textSize="12sp" textColor="#FFFFFF" bg="' + statusInfo.color + '" padding="5 12" cornerRadius="20" textStyle="bold"/>' +
         '        </horizontal>' +
+        '        <text text="' + (task.description || '暂无描述') + '" textSize="14sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
+        '        <text id="task_run_count" text="' + I.play + ' 执行 ' + (task.runCount || 0) + ' 次" textSize="13sp" textColor="' + C.textHint + '" marginTop="10"/>' +
         '      </vertical>' +
         '      <!-- 脚本编辑器 -->' +
         '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
@@ -61,8 +68,8 @@ UIScriptEditor.prototype.show = function(taskId) {
         '        <!-- 第二行：快捷按钮 -->' +
         '        <horizontal gravity="center_vertical" marginBottom="12">' +
         '          <button id="btn_ai_edit" text="' + I.robot + '" w="48" h="48" marginRight="8" bg="' + C.primary + '" textColor="#FFFFFF" textSize="20sp" cornerRadius="12"/>' +
-        '          <button id="btn_format" text="' + I.magic + '" w="48" h="48" marginRight="8" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="20sp" cornerRadius="12"/>' +
-        '          <button id="btn_snippets" text="' + I.clipboardList + '" w="48" h="48" marginRight="8" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="20sp" cornerRadius="12"/>' +
+        '          <button id="btn_format" text="' + I.bars + '" w="48" h="48" marginRight="8" bg="' + C.info + '" textColor="#FFFFFF" textSize="20sp" cornerRadius="12"/>' +
+        '          <button id="btn_snippets" text="' + I.code + '" w="48" h="48" marginRight="8" bg="' + C.success + '" textColor="#FFFFFF" textSize="20sp" cornerRadius="12"/>' +
         '          <button id="btn_reset" text="' + I.undo + '" w="48" h="48" bg="' + C.warning + '" textColor="#FFFFFF" textSize="20sp" cornerRadius="12"/>' +
         '        </horizontal>' +
         '        <input id="script_input" hint="请输入任务脚本代码..." textSize="13sp" textColor="' + C.textPrimary + '" bg="' + C.surface + '" padding="16" cornerRadius="12" minLines="15" gravity="top" singleLine="false"/>' +
@@ -102,7 +109,14 @@ UIScriptEditor.prototype.show = function(taskId) {
 
     ui.script_input.setText(self.scriptContent);
 
-    mgr.fontManager.apply(ui.btn_back, ui.btn_save, ui.btn_ai_edit, ui.btn_format, ui.btn_snippets, ui.btn_reset, ui.task_run_count, ui.task_author, ui.btn_run_now, ui.btn_logs, ui.btn_delete);
+    mgr.fontManager.applyLight(ui.btn_back, ui.btn_save);
+
+    // 应用字体到图标元素
+    var iconElements = [ui.btn_ai_edit, ui.btn_format, ui.btn_snippets, ui.btn_reset, ui.task_run_count, ui.task_author, ui.btn_run_now, ui.btn_logs, ui.btn_delete];
+    if (ui.schedule_text) {
+        iconElements.push(ui.schedule_text);
+    }
+    mgr.fontManager.apply.apply(mgr.fontManager, iconElements);
 
     ui.btn_back.on('click', function() {
         self.confirmExit();
@@ -250,6 +264,59 @@ UIScriptEditor.prototype.showSnippetsDialog = function() {
 
         toast('已插入代码片段: ' + snippet.name);
     });
+};
+
+/**
+ * 计算下次执行时间文本
+ */
+UIScriptEditor.prototype.calcNextRunText = function(schedule) {
+    if (!schedule || !schedule.time) return '';
+
+    var now = new Date();
+    var timeParts = schedule.time.split(':');
+    var hour = parseInt(timeParts[0]);
+    var minute = parseInt(timeParts[1]);
+
+    var nextRun = new Date();
+    nextRun.setHours(hour);
+    nextRun.setMinutes(minute);
+    nextRun.setSeconds(0);
+    nextRun.setMilliseconds(0);
+
+    // 如果今天的时间已过，推到明天
+    if (nextRun <= now) {
+        nextRun.setDate(nextRun.getDate() + 1);
+    }
+
+    // 根据周期调整
+    if (schedule.cycle === 'weekday') {
+        // 工作日（周一到周五）
+        while (nextRun.getDay() === 0 || nextRun.getDay() === 6) {
+            nextRun.setDate(nextRun.getDate() + 1);
+        }
+    } else if (schedule.cycle === 'weekend') {
+        // 周末（周六、周日）
+        while (nextRun.getDay() !== 0 && nextRun.getDay() !== 6) {
+            nextRun.setDate(nextRun.getDate() + 1);
+        }
+    }
+
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    var nextRunDay = new Date(nextRun);
+    nextRunDay.setHours(0, 0, 0, 0);
+
+    if (nextRunDay.getTime() === today.getTime()) {
+        return '今天 ' + schedule.time;
+    } else if (nextRunDay.getTime() === tomorrow.getTime()) {
+        return '明天 ' + schedule.time;
+    } else {
+        var month = nextRun.getMonth() + 1;
+        var day = nextRun.getDate();
+        return month + '/' + day + ' ' + schedule.time;
+    }
 };
 
 module.exports = UIScriptEditor;

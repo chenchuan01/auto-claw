@@ -4,15 +4,15 @@
  */
 
 function CodeHighlighter() {
-    // 颜色配置 - 深色主题（VS Code Dark+ 风格）
+    // 颜色配置 - 浅色主题（VS Code Light+ 风格）
     this.colors = {
-        keyword: '#569CD6',      // 关键字 - 浅蓝色
-        string: '#CE9178',       // 字符串 - 浅橙色
-        comment: '#6A9955',      // 注释 - 暗绿色
-        number: '#B5CEA8',       // 数字 - 浅绿色
-        function: '#DCDCAA',     // 函数名 - 浅黄色
-        operator: '#D4D4D4',     // 操作符 - 浅灰色
-        default: '#D4D4D4'       // 默认文本 - 浅灰色
+        keyword: '#0000FF',      // 关键字 - 蓝色
+        string: '#A31515',       // 字符串 - 深红色
+        comment: '#008000',      // 注释 - 绿色
+        number: '#098658',       // 数字 - 深绿色
+        function: '#795E26',     // 函数名 - 棕色
+        operator: '#1A1A2E',     // 操作符 - 深色
+        default: '#1A1A2E'       // 默认文本 - 深色
     };
 
     // JavaScript 关键字
@@ -68,6 +68,27 @@ CodeHighlighter.prototype.highlight = function(textView, code, language) {
     }
 
     textView.setText(builder);
+};
+
+/**
+ * 在 Editable 上应用高亮（用于实时编辑）
+ * @param {Editable} editable - Android Editable
+ * @param {String} text - 代码文本
+ */
+CodeHighlighter.prototype.applyHighlight = function(editable, text) {
+    var Spannable = android.text.Spannable;
+    var TypefaceSpan = android.text.style.TypefaceSpan;
+
+    // 应用等宽字体
+    editable.setSpan(
+        new TypefaceSpan('monospace'),
+        0,
+        editable.length(),
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+    );
+
+    // 应用 JavaScript 高亮
+    this.highlightJavaScript(editable);
 };
 
 /**

@@ -6,6 +6,63 @@
 var Config = require('../../core/config');
 
 /**
+ * 兼容性获取屏幕尺寸，多种方案依次兜底
+ * @returns {{ width: number, height: number }}
+ */
+function getScreenSize() {
+    var w = 0, h = 0;
+
+    // 方案1：device.width / device.height（AutoX 标准 API）
+    try {
+        w = device.width;
+        h = device.height;
+    } catch (e) {}
+
+    // 方案2：DisplayMetrics（通过 context Resources）
+    if (!w || !h) {
+        try {
+            var metrics = context.getResources().getDisplayMetrics();
+            w = metrics.widthPixels;
+            h = metrics.heightPixels;
+        } catch (e) {}
+    }
+
+    // 方案3：WindowManager getDefaultDisplay getRealMetrics（含导航栏、状态栏）
+    if (!w || !h) {
+        try {
+            var wm = context.getSystemService(android.content.Context.WINDOW_SERVICE);
+            var display = wm.getDefaultDisplay();
+            var realMetrics = new android.util.DisplayMetrics();
+            display.getRealMetrics(realMetrics);
+            w = realMetrics.widthPixels;
+            h = realMetrics.heightPixels;
+        } catch (e) {}
+    }
+
+    // 方案4：Display.getSize Point（兼容旧 API）
+    if (!w || !h) {
+        try {
+            var wm2 = context.getSystemService(android.content.Context.WINDOW_SERVICE);
+            var display2 = wm2.getDefaultDisplay();
+            var pt = new android.graphics.Point();
+            display2.getSize(pt);
+            w = pt.x;
+            h = pt.y;
+        } catch (e) {}
+    }
+
+    // 最终兜底：1080×1920
+    if (!w || !h) {
+        console.log('[coord-picker] 无法获取屏幕尺寸，使用默认值 1080x1920');
+        w = 1080;
+        h = 1920;
+    }
+
+    console.log('[coord-picker] 屏幕尺寸: ' + w + 'x' + h);
+    return { width: w, height: h };
+}
+
+/**
  * 启动坐标拾取
  */
 function startCoordinatePicker(self, callback) {
@@ -22,10 +79,13 @@ function startCoordinatePicker(self, callback) {
 
     // 在新线程创建悬浮窗
     threads.start(function() {
+        var screen = getScreenSize();
+        var screenW = screen.width;
+        var screenH = screen.height;
+
         // 悬浮窗只有准星本身大小，不覆盖整个屏幕
-        // 这样屏幕其他区域完全不受悬浮窗影响，自然可以自由操作
-        var startX = Math.floor((device.width - 48) / 2);
-        var startY = Math.floor((device.height - 48) / 2);
+        var startX = Math.floor((screenW - 48) / 2);
+        var startY = Math.floor((screenH - 48) / 2);
 
         var window = floaty.window(
             '<frame id="root" w="48" h="48" bg="#00000000">' +
@@ -44,9 +104,9 @@ function startCoordinatePicker(self, callback) {
         var lastRawY = 0;
 
         // 创建后立即设置初始位置到屏幕中心
-        window.setPosition(currentX, currentY);
+        window.setPosition(startX, startY);
 
-        console.log('[coord-picker] init at ' + currentX + ',' + currentY + ' screen=' + device.width + 'x' + device.height);
+        console.log('[coord-picker] init at ' + currentX + ',' + currentY + ' screen=' + screenW + 'x' + screenH);
 
         // 准星本身响应触摸拖动
         root.setOnTouchListener(function(view, event) {
@@ -73,8 +133,8 @@ function startCoordinatePicker(self, callback) {
                 currentX += dx;
                 currentY += dy;
                 // 限制在屏幕范围内
-                currentX = Math.max(0, Math.min(currentX, device.width - 48));
-                currentY = Math.max(0, Math.min(currentY, device.height - 48));
+                currentX = Math.max(0, Math.min(currentX, screenW - 48));
+                currentY = Math.max(0, Math.min(currentY, screenH - 48));
                 window.setPosition(currentX, currentY);
                 lastRawX = rawX;
                 lastRawY = rawY;
@@ -109,7 +169,6 @@ function startCoordinatePicker(self, callback) {
         // 关键设置：
         // 窗口只在准星大小，不覆盖全屏
         // 其他区域本来就不在悬浮窗上，自然能接收触摸
-        window.setTouchable(true);
         window.setFocusable(false);
         // 确保不抢焦点
         var attrs = window.getWindow().getAttributes();
@@ -147,8 +206,9 @@ function stopCoordinatePicker(self, window) {
  * 插入坐标到输入框
  */
 function insertCoordinateToInput(x, y, inputView, ui) {
-    var screenWidth = device.width;
-    var screenHeight = device.height;
+    var screen = getScreenSize();
+    var screenWidth = screen.width;
+    var screenHeight = screen.height;
     var xRatio = (x / screenWidth).toFixed(4);
     var yRatio = (y / screenHeight).toFixed(4);
     // 容错范围：屏幕宽高的 0.8%，约 6~8px（1080p 下约 8px），不超过 10px

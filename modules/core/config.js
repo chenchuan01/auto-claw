@@ -20,8 +20,10 @@ module.exports = {
         accent:        '#3B82F6',  // 强调浅蓝色
         success:       '#22C55E',  // 成功绿色
         warning:       '#F59E0B',  // 警告橙色
+        danger:        '#EF4444',  // 危险红色
         error:         '#EF4444',  // 错误红色
-        info:          '#3B82F6',  // 信息浅蓝色
+        info:          '#06B6D4',  // 信息青色
+        secondary:     '#6B7280',  // 次要灰色
         bg:            '#FFFFFF',  // 背景白色
         card:          '#F5F7FA',  // 卡片背景浅灰
         surface:       '#EEF1F6',  // 表面元素更浅灰
@@ -82,10 +84,10 @@ module.exports = {
 
     // 状态映射
     statusMap: {
-        idle:    { text: '待执行', color: '#F59E0B', dot: '●' },
-        running: { text: '执行中', color: '#1F6FEB', dot: '●' },
-        success: { text: '已完成', color: '#22C55E', dot: '●' },
-        failed:  { text: '失败',   color: '#EF4444', dot: '●' },
+        idle:    { text: '待执行', color: '#D1D5DB', dot: '●' },  // 浅灰色
+        running: { text: '执行中', color: '#3B82F6', dot: '●' },  // 品牌蓝色
+        success: { text: '已完成', color: '#22C55E', dot: '●' },  // success
+        failed:  { text: '失败',   color: '#EF4444', dot: '●' },  // danger
         paused:  { text: '已暂停', color: '#9C27B0', dot: '●' }
     },
 
@@ -113,6 +115,7 @@ module.exports = {
         backupInterval: 24 * 60 * 60 * 1000, // 24小时
         maxBackupFiles: 10,
         enableLogging: true,
-        logLevel: 'info'
+        logLevel: 'info',
+        logPath: '/sdcard/AutoClaw/logs/'
     }
 };

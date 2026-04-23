@@ -34,12 +34,11 @@ FontManager.prototype.load = function() {
             this.typeface = android.graphics.Typeface.createFromFile(this.fontPath);
             var fontName = this.fontType === 'feather' ? 'Feather Icons' : 'Font Awesome';
             console.log('[FontManager] ' + fontName + ' 字体加载成功');
-            return true;
         } else {
             console.warn('[FontManager] 字体文件不存在: ' + this.fontPath);
             console.warn('[FontManager] 将使用默认 Unicode 图标');
-            return false;
         }
+        return !!this.typeface;
     } catch (e) {
         console.error('[FontManager] 字体加载失败: ' + e);
         return false;
@@ -68,6 +67,35 @@ FontManager.prototype.apply = function() {
                         view.getPaint().setFakeBoldText(false);
                     } catch (e) {
                         console.error('[FontManager] 应用字体失败: ' + e);
+                    }
+                });
+            }
+        })(arguments[i]);
+    }
+};
+
+/**
+ * 应用细体效果到指定视图（用于 header 左右图标）
+ * 通过调整 Paint 的 strokeWidth 让图标看起来更细
+ * @param {...View} views - 要应用字体的视图（可传入多个）
+ */
+FontManager.prototype.applyLight = function() {
+    if (!this.typeface) return;
+
+    var tf = this.typeface;
+    for (var i = 0; i < arguments.length; i++) {
+        (function(view) {
+            if (view) {
+                ui.run(function() {
+                    try {
+                        view.setTypeface(tf, android.graphics.Typeface.NORMAL);
+                        var paint = view.getPaint();
+                        paint.setFakeBoldText(false);
+                        // 设置更细的笔画宽度
+                        paint.setStrokeWidth(0.5);
+                        paint.setStyle(android.graphics.Paint.Style.FILL_AND_STROKE);
+                    } catch (e) {
+                        console.error('[FontManager] 应用细体效果失败: ' + e);
                     }
                 });
             }

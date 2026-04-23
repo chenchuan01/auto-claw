@@ -86,7 +86,8 @@ UISchedule.prototype.show = function(taskId) {
         '</vertical>'
     );
 
-    this.uiManager.fontManager.apply(ui.btn_back, ui.btn_save, ui.btn_time, ui.info_icon);
+    this.uiManager.fontManager.applyLight(ui.btn_back, ui.btn_save);
+    this.uiManager.fontManager.apply(ui.btn_time, ui.info_icon);
 
     var currentCycle = schedule.cycle || 'daily';
     this.updateCycleUI(currentCycle);

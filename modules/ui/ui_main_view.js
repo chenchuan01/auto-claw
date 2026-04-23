@@ -29,10 +29,11 @@ UIMainView.prototype.show = function() {
         '    <list id="task_list" bg="' + C.bg + '">' +
         '      <frame margin="12 12 12 12" bg="' + C.card + '" cornerRadius="32" w="*">' +
         '        <vertical padding="16">' +
-        '        <!-- 第一行：任务名称 + 状态标签 -->' +
+        '        <!-- 第一行：任务名称 + 定时信息 + 状态圆点 -->' +
         '        <horizontal gravity="center_vertical">' +
         '          <text id="task_name" text="{{this.name}}" textSize="19sp" textColor="' + C.textPrimary + '" textStyle="bold" layout_weight="1"/>' +
-        '          <text id="status_tag" text="{{this.statusText}}" textSize="11sp" textColor="#FFFFFF" bg="{{this.statusColor}}" padding="4 8" cornerRadius="10"/>' +
+        '          <text id="schedule_text" text="{{this.scheduleText}}" textSize="11sp" textColor="' + C.primary + '" marginRight="8" textStyle="bold" visibility="{{this.scheduleVisible}}"/>' +
+        '          <text id="status_dot" text="{{this.statusDot}}" textSize="20sp" textColor="{{this.statusColor}}"/>' +
         '        </horizontal>' +
         '        <!-- 第二行：描述 -->' +
         '        <text id="task_desc" text="{{this.description}}" textSize="13sp" textColor="' + C.textSecondary + '" maxLines="1" marginTop="6"/>' +
@@ -60,7 +61,7 @@ UIMainView.prototype.show = function() {
 
     this.bindEvents();
     mgr.bindBottomNav();
-    mgr.fontManager.apply(ui.btn_settings);
+    mgr.fontManager.applyLight(ui.btn_settings);
     // 应用字体到空状态图标
     mgr.fontManager.apply(ui.empty_view.getChildAt(0));
 
@@ -79,6 +80,12 @@ UIMainView.prototype.loadData = function() {
     var tasks = mgr.dataManager.getTasks().map(function(task) {
         var statusInfo = Config.statusMap[task.status] || Config.statusMap.idle;
         var desc = task.description || '';
+        var scheduleVisible = 'gone';
+        var scheduleText = '';
+        if (task.schedule && task.schedule.enabled && task.schedule.time) {
+            scheduleVisible = 'visible';
+            scheduleText = I.clock + ' ' + self.calcNextRunText(task.schedule);
+        }
         return {
             id: task.id,
             name: task.name,
@@ -87,12 +94,39 @@ UIMainView.prototype.loadData = function() {
             statusText: statusInfo.text,
             statusColor: statusInfo.color,
             status: task.status,
+            isRunning: task.status === 'running',
             lastRunTimeText: mgr.formatTime(task.lastRunTime),
-            runCount: task.runCount || 0
+            runCount: task.runCount || 0,
+            scheduleVisible: scheduleVisible,
+            scheduleText: scheduleText
         };
     });
 
     ui.task_list.setDataSource(tasks);
+
+    // 手动更新所有可见列表项的按钮状态
+    ui.post(function() {
+        try {
+            var listView = ui.task_list;
+            if (!listView) return;
+
+            for (var i = 0; i < listView.getChildCount(); i++) {
+                var itemView = listView.getChildAt(i);
+                if (!itemView) continue;
+
+                var btnRun = itemView.findViewWithTag('btn_run');
+                if (!btnRun) continue;
+
+                // 获取对应的任务数据
+                if (i < tasks.length) {
+                    self.updateRunButton(btnRun, tasks[i].isRunning);
+                }
+            }
+        } catch (e) {
+            console.error('[UIMainView] 更新按钮状态失败: ' + e);
+        }
+    });
+
     ui.empty_view.attr('visibility', tasks.length === 0 ? 'visible' : 'gone');
 };
 
@@ -171,6 +205,68 @@ UIMainView.prototype.startBlinking = function(dotView, taskId) {
     }, 500);
 };
 
+UIMainView.prototype.updateRunButton = function(btnView, isRunning) {
+    var mgr = this.uiManager;
+    if (isRunning) {
+        btnView.attr('bg', C.warning);
+        btnView.setText(I.pause + ' 停止');
+    } else {
+        btnView.attr('bg', C.primary);
+        btnView.setText(I.play + ' 执行');
+    }
+    mgr.fontManager.apply(btnView);
+};
+
+UIMainView.prototype.calcNextRunText = function(schedule) {
+    if (!schedule || !schedule.time) return '';
+
+    var now = new Date();
+    var timeParts = schedule.time.split(':');
+    var hour = parseInt(timeParts[0]);
+    var minute = parseInt(timeParts[1]);
+
+    var nextRun = new Date();
+    nextRun.setHours(hour);
+    nextRun.setMinutes(minute);
+    nextRun.setSeconds(0);
+    nextRun.setMilliseconds(0);
+
+    // 如果今天的时间已过，推到明天
+    if (nextRun <= now) {
+        nextRun.setDate(nextRun.getDate() + 1);
+    }
+
+    // 根据周期调整
+    if (schedule.cycle === 'weekday') {
+        // 工作日（周一到周五）
+        while (nextRun.getDay() === 0 || nextRun.getDay() === 6) {
+            nextRun.setDate(nextRun.getDate() + 1);
+        }
+    } else if (schedule.cycle === 'weekend') {
+        // 周末（周六、周日）
+        while (nextRun.getDay() !== 0 && nextRun.getDay() !== 6) {
+            nextRun.setDate(nextRun.getDate() + 1);
+        }
+    }
+
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    var nextRunDay = new Date(nextRun);
+    nextRunDay.setHours(0, 0, 0, 0);
+
+    if (nextRunDay.getTime() === today.getTime()) {
+        return '今天 ' + schedule.time;
+    } else if (nextRunDay.getTime() === tomorrow.getTime()) {
+        return '明天 ' + schedule.time;
+    } else {
+        var month = nextRun.getMonth() + 1;
+        var day = nextRun.getDate();
+        return month + '月' + day + '日 ' + schedule.time;
+    }
+};
+
 UIMainView.prototype.bindEvents = function() {
     var self = this;
     var mgr = this.uiManager;
@@ -183,6 +279,11 @@ UIMainView.prototype.bindEvents = function() {
             statusDot.setTag('status_dot');
         }
 
+        // 给按钮打标签，方便后续查找
+        if (itemView.btn_run) {
+            itemView.btn_run.setTag('btn_run');
+        }
+
         // 只在任务真正运行时才启动闪烁
         if (itemHolder && itemHolder.item && itemHolder.item.status === 'running' && statusDot) {
             self.startBlinking(statusDot, itemHolder.item.id);
@@ -193,10 +294,35 @@ UIMainView.prototype.bindEvents = function() {
 
         // 应用 Font Awesome 字体到图标
         mgr.fontManager.apply(itemView.btn_run, itemView.btn_manage, itemView.last_run_time, itemView.run_count);
+        if (itemView.schedule_text) {
+            mgr.fontManager.apply(itemView.schedule_text);
+        }
+
+        // 根据运行状态更新按钮外观
+        if (itemHolder && itemHolder.item) {
+            self.updateRunButton(itemView.btn_run, itemHolder.item.isRunning);
+        }
+
+        // 清除旧的点击监听器，避免重复绑定
+        itemView.btn_run.removeAllListeners('click');
+        itemView.btn_manage.removeAllListeners('click');
 
         itemView.btn_run.on('click', function() {
             if (itemHolder && itemHolder.item) {
-                mgr.executeTask(itemHolder.item.id);
+                var taskId = itemHolder.item.id;
+                var isRunning = itemHolder.item.isRunning;
+
+                if (isRunning) {
+                    // 立即更新按钮状态为执行
+                    self.updateRunButton(itemView.btn_run, false);
+                    // 停止任务
+                    mgr.stopTask(taskId);
+                } else {
+                    // 立即更新按钮状态为停止
+                    self.updateRunButton(itemView.btn_run, true);
+                    // 执行任务
+                    mgr.executeTask(taskId);
+                }
             }
         });
         itemView.btn_manage.on('click', function() {

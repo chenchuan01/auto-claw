@@ -64,9 +64,9 @@ UITaskLogs.prototype.show = function(taskId) {
     );
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_clear_logs);
+    mgr.fontManager.applyLight(ui.btn_back, ui.btn_clear_logs);
     if (hasError && ui.btn_copy_error) {
-        mgr.fontManager.apply(ui.btn_copy_error);
+        mgr.fontManager.applyLight(ui.btn_copy_error);
     }
 
     // 动态设置日志内容（避免XML转义问题）

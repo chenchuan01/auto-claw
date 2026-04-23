@@ -11,16 +11,25 @@ function UISettings(uiManager) {
     this.uiManager = uiManager;
 }
 
+UISettings.prototype.getSystemConfig = function() {
+    var storage = storages.create('autoclaw_system');
+    return {
+        enableLogging: storage.get('enableLogging', Config.settings.enableLogging),
+        logPath: storage.get('logPath', Config.settings.logPath)
+    };
+};
+
 UISettings.prototype.show = function() {
     var self = this;
     var mgr = this.uiManager;
     var aiConfig = mgr.aiService.aiConfig.getConfig();
+    var systemConfig = this.getSystemConfig();
 
     ui.layout(
         '<vertical bg="' + C.bg + '">' +
         '  <!-- 标题栏 -->' +
         HeaderBuilder.buildHeader({
-            title: 'AI 设置',
+            title: '系统设置',
             leftIcon: I.arrowLeft,
             leftIconId: 'btn_back',
             rightIcon: I.save,
@@ -71,6 +80,21 @@ UISettings.prototype.show = function() {
         '        <text text="2. OpenAI 格式填 base URL，自动拼接 /chat/completions" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
         '        <text text="3. Anthropic 格式填 base URL，自动拼接 /v1/messages" textSize="13sp" textColor="' + C.textSecondary + '" marginTop="8"/>' +
         '      </vertical>' +
+        '      ' +
+        '      <!-- 系统参数 -->' +
+        '      <vertical bg="' + C.card + '" cornerRadius="20" padding="24" marginTop="16">' +
+        '        <text text="系统参数" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
+        '        ' +
+        '        <horizontal gravity="center_vertical" marginBottom="16">' +
+        '          <text text="启用系统日志" textSize="14sp" textColor="' + C.textPrimary + '" layout_weight="1"/>' +
+        '          <Switch id="switch_enable_log" checked="' + systemConfig.enableLogging + '" trackColor="' + C.primary + '"/>' +
+        '        </horizontal>' +
+        '        ' +
+        '        <text text="日志存放路径" textSize="14sp" textColor="' + C.textSecondary + '" marginBottom="8"/>' +
+        '        <input id="input_log_path" hint="/sdcard/AutoClaw/logs/" text="' + systemConfig.logPath + '" textSize="14sp" textColor="' + C.textPrimary + '" bg="' + C.surface + '" padding="12" cornerRadius="12" singleLine="true"/>' +
+        '        ' +
+        '        <button id="btn_clear_cache" text="清理缓存" textSize="14sp" textColor="#FFFFFF" bg="' + C.warning + '" cornerRadius="12" padding="12" marginTop="16"/>' +
+        '      </vertical>' +
         '    </vertical>' +
         '  </scroll>' +
         mgr.buildBottomNav('tasks') +
@@ -80,7 +104,7 @@ UISettings.prototype.show = function() {
     var selectedFormat = aiConfig.messageFormat;
 
     // 应用字体
-    mgr.fontManager.apply(ui.btn_back, ui.btn_save);
+    mgr.fontManager.applyLight(ui.btn_back, ui.btn_save);
     mgr.bindBottomNav();
 
     // 强制设置 API Key 为密码模式
@@ -118,6 +142,8 @@ UISettings.prototype.saveSettings = function(messageFormat) {
     var apiUrl = ui.input_api_url.getText().toString().trim();
     var apiKey = ui.input_api_key.getText().toString().trim();
     var model = ui.input_model.getText().toString().trim();
+    var enableLogging = ui.switch_enable_log.isChecked();
+    var logPath = ui.input_log_path.getText().toString().trim();
 
     if (!apiUrl) {
         toast('请输入 API URL');
@@ -134,12 +160,18 @@ UISettings.prototype.saveSettings = function(messageFormat) {
         return;
     }
 
+    // 保存 AI 配置
     mgr.aiService.aiConfig.saveConfig({
         apiUrl: apiUrl,
         apiKey: apiKey,
         model: model,
         messageFormat: messageFormat
     });
+
+    // 保存系统配置
+    var storage = storages.create('autoclaw_system');
+    storage.put('enableLogging', enableLogging);
+    storage.put('logPath', logPath);
 
     toast('设置已保存');
     mgr.showMainView();

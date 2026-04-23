@@ -42,10 +42,10 @@ var MESSAGE_BUBBLE_CONFIG = {
     lineSpacing: '4',
     textGravity: 'left',  // 文本在气泡内居左
 
-    // 代码块样式 - 深色主题
+    // 代码块样式 - 浅色主题
     codeBlock: {
-        bgColor: '#1E1E1E',
-        textColor: '#D4D4D4',
+        bgColor: '#F5F7FA',
+        textColor: '#1A1A2E',
         textSize: '12sp',
         radius: '8',
         padding: '12 10',

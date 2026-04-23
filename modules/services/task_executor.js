@@ -11,7 +11,7 @@ function TaskExecutor(dataManager) {
     this.taskLogs = {};     // taskId -> logs[]
 }
 
-TaskExecutor.prototype.executeTask = function(taskId) {
+TaskExecutor.prototype.executeTask = function(taskId, onComplete) {
     var self = this;
     var task = this.dataManager.getTaskById(taskId);
 
@@ -53,11 +53,18 @@ TaskExecutor.prototype.executeTask = function(taskId) {
 
     try {
         // 使用 threads.start 直接在新线程执行脚本，这种方式更可靠
+        var taskState = { hasError: false };
         var thread = threads.start(function() {
             try {
                 eval(task.script);
             } catch (e) {
-                self.addTaskLog(taskId, '✕ 脚本执行异常: ' + e.message + ' @行 ' + e.lineNumber);
+                // ScriptInterruptedException 是正常的中断，不是错误
+                var isInterrupted = e.javaException &&
+                    e.javaException.getClass().getName().indexOf('ScriptInterruptedException') >= 0;
+                if (!isInterrupted) {
+                    taskState.hasError = true;
+                    self.addTaskLog(taskId, '✕ 脚本执行异常: ' + e.message + ' @行 ' + e.lineNumber);
+                }
             }
         });
         this.runningTasks[taskId] = thread;
@@ -80,29 +87,29 @@ TaskExecutor.prototype.executeTask = function(taskId) {
                 // 等待过程中发生异常
                 self.addTaskLog(taskId, '✕ 监控异常: ' + e.message);
             } finally {
-                // 不管怎样，都清理运行记录并更新状态
-                if (self.runningTasks[taskId] === thread) {
+                // 只有 runningTasks 中仍是当前线程，才视为正常结束（非手动停止）
+                var isNormalEnd = (self.runningTasks[taskId] === thread);
+                if (isNormalEnd) {
                     delete self.runningTasks[taskId];
-                }
-                var currentTask = self.dataManager.getTaskById(taskId);
-                if (currentTask) {
-                    // 如果任务还在运行状态，说明它正常执行完成了
-                    // 如果已经被停止，就保持停止状态
-                    if (currentTask.status === 'running') {
-                        // 检查线程是否真的执行成功
-                        var isSuccess = true;
-                        try {
-                            isSuccess = thread && thread.isAlive && !thread.isAlive();
-                        } catch(e) {
-                            isSuccess = true;
-                        }
-                        self.dataManager.updateTask(taskId, {
-                            status: isSuccess ? 'success' : 'failed'
-                        });
-                        if (isSuccess) {
-                            self.addTaskLog(taskId, '[OK] 任务执行完成');
+                    var currentTask = self.dataManager.getTaskById(taskId);
+                    if (currentTask && currentTask.status === 'running') {
+                        // 根据是否有错误设置状态
+                        var finalStatus = taskState.hasError ? 'failed' : 'success';
+                        self.dataManager.updateTask(taskId, { status: finalStatus });
+                        if (taskState.hasError) {
+                            self.addTaskLog(taskId, '[ERROR] 任务执行失败');
                         } else {
-                            self.addTaskLog(taskId, '✕ 任务执行失败');
+                            self.addTaskLog(taskId, '[OK] 任务执行完成');
+                        }
+                        // 通知 UI 任务已完成
+                        if (onComplete) {
+                            try {
+                                ui.post(function() {
+                                    onComplete(taskId);
+                                });
+                            } catch (e) {
+                                console.error('[TaskExecutor] 完成回调异常: ' + e);
+                            }
                         }
                     }
                 }
@@ -132,13 +139,18 @@ TaskExecutor.prototype.stopTask = function(taskId) {
     if (!thread) { toast('任务未在运行'); return false; }
 
     try {
-        thread.interrupt();
+        // 先删除引用，让监控线程知道是手动停止
         delete this.runningTasks[taskId];
-        this.dataManager.updateTask(taskId, { status: 'paused' });
+        // 更新状态为暂停
+        this.dataManager.updateTask(taskId, { status: 'idle' });
         this.addTaskLog(taskId, '‖ 任务被手动停止');
+        // 强制停止线程
+        thread.interrupt();
         toast('任务已停止');
         return true;
     } catch (e) {
+        this.addTaskLog(taskId, '✕ 停止任务失败: ' + e.message);
+        console.error('[TaskExecutor] 停止任务异常: ' + e.message + '\n' + e.stack);
         toast('停止任务失败: ' + e.message);
         return false;
     }
