@@ -74,26 +74,57 @@ function runScript(self) {
         mgr.dataManager.addTemporaryTask(tempTask);
         self.lastTempTaskId = tempTaskId;
 
+        // 切换UI状态：运行中 -> 显示停止，隐藏运行
+        ui.post(function() {
+            if (ui.btn_run_script) ui.btn_run_script.attr('visibility', 'gone');
+            if (ui.btn_stop_script) ui.btn_stop_script.attr('visibility', 'visible');
+            if (ui.btn_view_logs) ui.btn_view_logs.attr('visibility', 'gone');
+        });
+
         // 执行任务并记录日志
-        var success = mgr.taskExecutor.executeTask(tempTaskId);
+        var success = mgr.taskExecutor.executeTask(tempTaskId, function() {
+            // 执行完成回调，恢复UI状态
+            ui.post(function() {
+                if (ui.btn_run_script) ui.btn_run_script.attr('visibility', 'visible');
+                if (ui.btn_stop_script) ui.btn_stop_script.attr('visibility', 'gone');
+                if (ui.btn_view_logs) ui.btn_view_logs.attr('visibility', 'visible');
+            });
+        });
 
         if (success) {
-            // 显示查看日志按钮
-            ui.post(function() {
-                if (ui.btn_view_logs) {
-                    ui.btn_view_logs.attr('visibility', 'visible');
-                }
-            });
-            toast('脚本已开始运行，运行完成后可点击查看日志');
+            toast('脚本已开始运行');
         } else {
-            // 执行失败也要显示日志按钮查看错误
+            // 执行失败也要恢复UI并显示日志按钮查看错误
             ui.post(function() {
-                if (ui.btn_view_logs) {
-                    ui.btn_view_logs.attr('visibility', 'visible');
-                }
+                if (ui.btn_run_script) ui.btn_run_script.attr('visibility', 'visible');
+                if (ui.btn_stop_script) ui.btn_stop_script.attr('visibility', 'gone');
+                if (ui.btn_view_logs) ui.btn_view_logs.attr('visibility', 'visible');
             });
         }
     });
+}
+
+/**
+ * 停止当前运行的脚本
+ */
+function stopScript(self) {
+    var mgr = self.uiManager;
+
+    if (!self.lastTempTaskId) {
+        toast('没有正在运行的脚本');
+        return;
+    }
+
+    mgr.taskExecutor.stopTask(self.lastTempTaskId);
+
+    // 恢复UI状态
+    ui.post(function() {
+        if (ui.btn_run_script) ui.btn_run_script.attr('visibility', 'visible');
+        if (ui.btn_stop_script) ui.btn_stop_script.attr('visibility', 'gone');
+        if (ui.btn_view_logs) ui.btn_view_logs.attr('visibility', 'visible');
+    });
+
+    toast('脚本已停止');
 }
 
 /**
@@ -203,6 +234,7 @@ module.exports = {
     updateScriptPreview: updateScriptPreview,
     updateLineNumbers: updateLineNumbers,
     runScript: runScript,
+    stopScript: stopScript,
     viewTempTaskLogs: viewTempTaskLogs,
     saveAsTask: saveAsTask
 };

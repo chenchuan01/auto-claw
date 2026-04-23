@@ -112,16 +112,26 @@ function renderMessages(self) {
                     contentContainer.addView(textView);
                 } else if (block.type === 'code') {
                     var lineCount = block.content.split('\n').length;
-                    var codeBg = '#F0F4F8';
-                    var codeHeaderBg = '#E2E8F0';
-                    var codeFg = '#1A1A2E';
+                    // 根据消息角色选择代码块配色
+                    var codeBg, codeHeaderBg, codeFg;
+                    if (isUser) {
+                        // 用户气泡（蓝色背景）使用深色代码块
+                        codeBg = '#1E3A5F';
+                        codeHeaderBg = '#2D4A73';
+                        codeFg = '#E6F0FF';
+                    } else {
+                        // AI气泡（浅色背景）使用浅色代码块
+                        codeBg = '#F0F4F8';
+                        codeHeaderBg = '#E2E8F0';
+                        codeFg = '#1A1A2E';
+                    }
                     var codeBlock = ui.inflate(
                         '<vertical>' +
                         '  <horizontal id="code_header" bg="' + codeHeaderBg + '" cornerRadius="8" padding="8 10" gravity="center_vertical" marginTop="6" marginBottom="0">' +
                         '    <text id="code_title" text="' + I.code + ' 代码 (' + lineCount + ' 行)" textSize="13sp" textColor="' + codeFg + '" layout_weight="1"/>' +
-                        '    <text id="code_toggle" text="' + I.arrowDown + '" textSize="16sp" textColor="' + codeFg + '"/>' +
+                        '    <text id="code_toggle" text="' + I.arrowLeft + '" textSize="16sp" textColor="' + codeFg + '"/>' +
                         '  </horizontal>' +
-                        '  <vertical id="code_content" bg="' + codeBg + '" cornerRadius="0 0 8 8" padding="12 10" visibility="visible">' +
+                        '  <vertical id="code_content" bg="' + codeBg + '" cornerRadius="0 0 8 8" padding="12 10" visibility="gone">' +
                         '    <text id="code_text" textSize="12sp" textColor="' + codeFg + '" textIsSelectable="true" gravity="left"/>' +
                         '  </vertical>' +
                         '</vertical>'
@@ -129,10 +139,10 @@ function renderMessages(self) {
 
                     // 使用语法高亮渲染代码
                     var highlighter = new CodeHighlighter();
-                    highlighter.highlight(codeBlock.code_text, block.content, block.language);
+                    highlighter.highlight(codeBlock.code_text, block.content, block.language, isUser);
 
-                    // 默认展开
-                    var expanded = true;
+                    // 默认收起，减少对话篇幅
+                    var expanded = false;
                     codeBlock.code_header.on('click', function() {
                         expanded = !expanded;
                         if (expanded) {

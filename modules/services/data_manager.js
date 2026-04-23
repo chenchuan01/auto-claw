@@ -284,6 +284,7 @@ DataManager.prototype.deleteAIConversation = function(convId) {
 
 /**
  * 生成对话标题（从第一条用户消息截取）
+ * 去除Markdown代码块，只保留纯文本
  */
 DataManager.prototype.generateConversationTitle = function(messages) {
     if (!messages || messages.length === 0) return '新对话';
@@ -291,8 +292,16 @@ DataManager.prototype.generateConversationTitle = function(messages) {
         return m.role === 'user';
     })[0];
     if (!firstUserMsg) return '新对话';
-    var title = firstUserMsg.content.substring(0, 30);
-    if (firstUserMsg.content.length > 30) title += '...';
+
+    // 去除代码块 ``` ... ```，只保留纯文本部分
+    var content = firstUserMsg.content.replace(/```[\s\S]*?```/g, '').trim();
+    // 如果去除代码块后为空，使用原文本并去除反引号
+    if (!content) {
+        content = firstUserMsg.content.replace(/```/g, '').trim();
+    }
+
+    var title = content.substring(0, 30);
+    if (content.length > 30) title += '...';
     return title;
 };
 

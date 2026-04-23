@@ -223,7 +223,7 @@ UIAIChat.prototype.showWithScript = function(script, taskName, currentTaskId) {
     mgr.fontManager.apply(ui.btn_save_task, ui.btn_run_script, ui.btn_view_logs, ui.btn_pick_coordinate, ui.btn_format, ui.btn_clear_script, ui.btn_quick_pick, ui.btn_send, ui.tab_chat_text, ui.tab_script_text);
 
     // 添加初始提示消息，包含要编辑的脚本
-    var prompt = '请帮我优化/修改这个脚本：\n\n```javascript\n' + script + '\n```';
+    var prompt = '我的原始脚本如下:\n\n```javascript\n' + script + '\n```';
     this.addMessage('user', prompt);
 
     // 脚本已经在输入框
@@ -234,28 +234,15 @@ UIAIChat.prototype.showWithScript = function(script, taskName, currentTaskId) {
     scriptOperations.updateScriptPreview(this);
     scriptOperations.updateLineNumbers();
 
-    // 默认停留在对话tab，自动发送AI请求
+    // 默认停留在对话tab，不自动发送，等待用户确认后发送
     ui.post(function() {
         self.switchTab('chat');
-        // 自动发送请求给AI进行编辑
+        // 默认聚焦输入框，方便用户补充说明后发送
         ui.post(function() {
-            // 添加加载提示
-            self.addMessage('assistant', '正在思考...');
-
-            // 发送到 AI
-            mgr.aiService.sendMessage(self.messages.slice(0, -1), function(error, response) {
-                // 移除加载提示
-                self.messages.pop();
-
-                if (error) {
-                    self.addMessage('assistant', '抱歉，发生错误：' + error);
-                } else {
-                    self.addMessage('assistant', response);
-                    // 更新脚本预览
-                    scriptOperations.updateScriptPreview(self);
-                }
-            });
-        }, 500);
+            ui.input_message.requestFocus();
+            var imm = context.getSystemService(android.view.inputmethod.InputMethodManager);
+            imm.showSoftInput(ui.input_message, 0);
+        }, 300);
     });
 };
 

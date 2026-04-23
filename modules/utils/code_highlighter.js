@@ -4,15 +4,28 @@
  */
 
 function CodeHighlighter() {
-    // 颜色配置 - 浅色主题（VS Code Light+ 风格）
-    this.colors = {
-        keyword: '#0000FF',      // 关键字 - 蓝色
-        string: '#A31515',       // 字符串 - 深红色
-        comment: '#008000',      // 注释 - 绿色
-        number: '#098658',       // 数字 - 深绿色
-        function: '#795E26',     // 函数名 - 棕色
-        operator: '#1A1A2E',     // 操作符 - 深色
-        default: '#1A1A2E'       // 默认文本 - 深色
+    // 颜色配置
+    this.colorThemes = {
+        // 浅色主题（VS Code Light+ 风格）- 用于浅色背景
+        light: {
+            keyword: '#0000FF',      // 关键字 - 蓝色
+            string: '#A31515',       // 字符串 - 深红色
+            comment: '#008000',      // 注释 - 绿色
+            number: '#098658',       // 数字 - 深绿色
+            function: '#795E26',     // 函数名 - 棕色
+            operator: '#1A1A2E',     // 操作符 - 深色
+            default: '#1A1A2E'       // 默认文本 - 深色
+        },
+        // 深色主题（VS Code Dark+ 风格）- 用于深色背景
+        dark: {
+            keyword: '#9CDCFE',      // 关键字 - 浅蓝色
+            string: '#CE9178',       // 字符串 - 浅橙色
+            comment: '#6A9955',      // 注释 - 暗绿色
+            number: '#B5CEA8',       // 数字 - 浅绿色
+            function: '#DCDCAA',     // 函数名 - 浅黄色
+            operator: '#D4D4D4',     // 操作符 - 浅灰色
+            default: '#D4D4D4'       // 默认文本 - 浅灰色
+        }
     };
 
     // JavaScript 关键字
@@ -43,8 +56,9 @@ function CodeHighlighter() {
  * @param {TextView} textView - Android TextView
  * @param {String} code - 代码文本
  * @param {String} language - 语言类型（目前只支持 javascript）
+ * @param {Boolean} isDarkTheme - 是否使用深色主题（适配深色背景）
  */
-CodeHighlighter.prototype.highlight = function(textView, code, language) {
+CodeHighlighter.prototype.highlight = function(textView, code, language, isDarkTheme) {
     var SpannableStringBuilder = android.text.SpannableStringBuilder;
     var Spannable = android.text.Spannable;
     var ForegroundColorSpan = android.text.style.ForegroundColorSpan;
@@ -52,6 +66,9 @@ CodeHighlighter.prototype.highlight = function(textView, code, language) {
     var TypefaceSpan = android.text.style.TypefaceSpan;
     var Typeface = android.graphics.Typeface;
     var Color = android.graphics.Color;
+
+    // 选择主题
+    this.colors = isDarkTheme ? this.colorThemes.dark : this.colorThemes.light;
 
     var builder = new SpannableStringBuilder(code);
 
@@ -74,10 +91,14 @@ CodeHighlighter.prototype.highlight = function(textView, code, language) {
  * 在 Editable 上应用高亮（用于实时编辑）
  * @param {Editable} editable - Android Editable
  * @param {String} text - 代码文本
+ * @param {Boolean} isDarkTheme - 是否使用深色主题
  */
-CodeHighlighter.prototype.applyHighlight = function(editable, text) {
+CodeHighlighter.prototype.applyHighlight = function(editable, text, isDarkTheme) {
     var Spannable = android.text.Spannable;
     var TypefaceSpan = android.text.style.TypefaceSpan;
+
+    // 选择主题
+    this.colors = isDarkTheme ? this.colorThemes.dark : this.colorThemes.light;
 
     // 应用等宽字体
     editable.setSpan(

@@ -82,11 +82,28 @@ UIAIHistory.prototype.renderHistoryList = function(conversations) {
         var msgCount = conv.messages ? conv.messages.length : 0;
         var userMsgCount = conv.messages ? conv.messages.filter(function(m) { return m.role === 'user'; }).length : 0;
 
+        // 清理标题文本（移除Markdown符号和换行）
+        function cleanTitle(str) {
+            if (!str) return '新对话';
+            // 移除所有代码块标记反引号
+            var cleaned = str.replace(/`/g, '');
+            // 移除换行，多个空格变一个，保持单行
+            cleaned = cleaned.replace(/\s+/g, ' ').trim();
+            // 截断过长标题
+            if (cleaned.length > 30) {
+                cleaned = cleaned.substring(0, 30) + '...';
+            }
+            return cleaned;
+        }
+
+        var cleanedTitle = cleanTitle(conv.title);
+
         // 在 AutoJs 中，ui.inflate 后可以通过 .<id> 直接访问子view
+        // 标题不在XML中设置，动态设置避免XML解析错误
         var xml =
             '<horizontal id="item_container" margin="0 0 0 12" gravity="center_vertical" bg="' + C.card + '" cornerRadius="16" padding="16">' +
             '  <vertical layout_weight="1" padding="0 4">' +
-            '    <text id="conv_title" text="' + conv.title + '" textSize="16sp" textColor="' + C.textPrimary + '" textStyle="bold" singleLine="true"/>' +
+            '    <text id="conv_title" textSize="16sp" textColor="' + C.textPrimary + '" textStyle="bold" singleLine="true"/>' +
             '    <horizontal gravity="center_vertical" marginTop="6">' +
             '      <text text="' + I.calendar + ' ' + dateStr + '" textSize="12sp" textColor="' + C.textHint + '" marginRight="16"/>' +
             '      <text text="' + I.comment + ' ' + userMsgCount + ' 轮对话" textSize="12sp" textColor="' + C.textHint + '"/>' +
@@ -102,6 +119,8 @@ UIAIHistory.prototype.renderHistoryList = function(conversations) {
         var itemContainer = item.item_container;
         var deleteBtn = item.btn_delete;
         var convTitle = item.conv_title;
+        // 动态设置标题，避免XML解析错误
+        convTitle.setText(cleanedTitle);
 
         // 只对删除按钮应用字体（因为它有X图标），标题是普通文字不需要
         if (deleteBtn) mgr.fontManager.apply(deleteBtn);
