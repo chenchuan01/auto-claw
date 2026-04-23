@@ -45,35 +45,45 @@ function buildLayout(title) {
         '  </frame>' +
         '  <!-- 脚本视图 -->' +
         '  <frame id="view_script" layout_weight="1" visibility="gone">' +
-        '    <vertical bg="' + C.bg + '" padding="12">' +
-        '      <!-- 编辑器工具栏 -->' +
-        '      <horizontal bg="' + C.card + '" cornerRadius="12 12 0 0" padding="12 10" gravity="center_vertical">' +
-        '        <text id="script_title" text="暂无脚本" textSize="13sp" textColor="' + C.textSecondary + '" layout_weight="1" singleLine="true"/>' +
-        '        <text id="btn_pick_coordinate" text="' + I.target + '" textSize="16sp" textColor="#FFFFFF" bg="' + C.info + '" w="36" h="36" gravity="center" cornerRadius="18" marginRight="6"/>' +
-        '        <text id="btn_format" text="' + I.magic + '" textSize="16sp" textColor="#FFFFFF" bg="' + C.warning + '" w="36" h="36" gravity="center" cornerRadius="18" marginRight="6"/>' +
-        '        <text id="btn_clear_script" text="' + I.trash + '" textSize="16sp" textColor="#FFFFFF" bg="' + C.error + '" w="36" h="36" gravity="center" cornerRadius="18"/>' +
-        '      </horizontal>' +
-        '      <!-- 编辑区域 -->' +
-        '      <horizontal bg="#F0F4F8" cornerRadius="0 0 12 12" layout_weight="1">' +
-        '        <!-- 行号 -->' +
-        '        <scroll id="line_number_scroll" w="40" bg="#E2E8F0">' +
-        '          <vertical id="line_numbers" padding="12 12 4 12">' +
-        '            <text id="line_number_text" text="1" textSize="12sp" textColor="' + C.textHint + '" gravity="right" lineSpacingExtra="2"/>' +
-        '          </vertical>' +
-        '        </scroll>' +
-        '        <!-- 代码输入框 -->' +
-        '        <scroll layout_weight="1">' +
-        '          <input id="script_editor" hint="AI 生成的脚本将显示在这里，你也可以直接编辑..." textSize="12sp" textColor="' + C.textPrimary + '" padding="12" singleLine="false" gravity="top" bg="#00000000" inputType="textMultiLine"/>' +
-        '        </scroll>' +
-        '      </horizontal>' +
-        '      <!-- 底部按钮 -->' +
-        '      <horizontal marginTop="12">' +
-        '        <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.primary + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="4" textStyle="bold"/>' +
-        '        <button id="btn_stop_script" text="' + I.stop + ' 停止" bg="' + C.error + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" marginRight="4" visibility="gone"/>' +
-        '        <button id="btn_view_logs" text="' + I.bars + ' 日志" bg="' + C.info + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" marginRight="4" visibility="gone"/>' +
-        '        <button id="btn_save_task" text="' + I.save + ' 保存任务" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" textStyle="bold"/>' +
-        '      </horizontal>' +
-        '    </vertical>' +
+        '    <scroll bg="' + C.bg + '">' +
+        '      <vertical padding="12">' +
+        '        <!-- 脚本编辑卡片，和任务详情格式一致 -->' +
+        '        <vertical bg="' + C.card + '" cornerRadius="20" padding="24">' +
+        '          <text text="AI 生成脚本" textSize="16sp" textColor="' + C.accent + '" textStyle="bold" marginBottom="12"/>' +
+        '          <!-- 编辑器工具栏 -->' +
+        '          <horizontal bg="' + C.surface + '" cornerRadius="12 12 0 0" padding="12 10" gravity="center_vertical" marginBottom="0">' +
+        '            <text id="script_title" text="暂无脚本" textSize="13sp" textColor="' + C.textSecondary + '" layout_weight="1" singleLine="true"/>' +
+        '            <text id="btn_pick_coordinate" text="' + I.target + '" textSize="16sp" textColor="#FFFFFF" bg="' + C.info + '" w="36" h="36" gravity="center" cornerRadius="18" marginRight="6"/>' +
+        '            <text id="btn_format" text="' + I.magic + '" textSize="16sp" textColor="#FFFFFF" bg="' + C.warning + '" w="36" h="36" gravity="center" cornerRadius="18" marginRight="6"/>' +
+        '            <text id="btn_clear_script" text="' + I.trash + '" textSize="16sp" textColor="#FFFFFF" bg="' + C.error + '" w="36" h="36" gravity="center" cornerRadius="18"/>' +
+        '          </horizontal>' +
+        '          <!-- 编辑区域 -->' +
+        '          <horizontal bg="' + C.surface + '" cornerRadius="0 0 12 12" layout_weight="1">' +
+        '            <!-- 行号 -->' +
+        '            <scroll id="line_number_scroll" w="40" bg="' + C.divider + '">' +
+        '              <vertical id="line_numbers" padding="12 12 4 12">' +
+        '                <text id="line_number_text" text="1" textSize="12sp" textColor="' + C.textHint + '" gravity="right" lineSpacingExtra="2"/>' +
+        '              </vertical>' +
+        '            </scroll>' +
+        '            <!-- 代码输入框 -->' +
+        '            <scroll layout_weight="1">' +
+        '              <input id="script_editor" hint="AI 生成的脚本将显示在这里，你也可以直接编辑..." textSize="12sp" textColor="' + C.textPrimary + '" padding="12" singleLine="false" gravity="top" bg="#00000000" inputType="textMultiLine"/>' +
+        '            </scroll>' +
+        '          </horizontal>' +
+        '        </vertical>' +
+        '        <!-- 底部操作按钮 -->' +
+        '        <vertical marginTop="12">' +
+        '          <horizontal>' +
+        '            <button id="btn_run_script" text="' + I.play + ' 运行" bg="' + C.primary + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginRight="4" textStyle="bold"/>' +
+        '            <button id="btn_stop_script" text="' + I.stop + ' 停止" bg="' + C.error + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" marginRight="4" visibility="gone"/>' +
+        '            <button id="btn_view_logs" text="' + I.bars + ' 日志" bg="' + C.info + '" textColor="#FFFFFF" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" marginLeft="4" marginRight="4" visibility="gone"/>' +
+        '          </horizontal>' +
+        '          <horizontal marginTop="12">' +
+        '            <button id="btn_save_task" text="' + I.save + ' 保存任务" bg="' + C.surface + '" textColor="' + C.textSecondary + '" textSize="14sp" cornerRadius="16" h="48" layout_weight="1" textStyle="bold"/>' +
+        '          </horizontal>' +
+        '        </vertical>' +
+        '      </vertical>' +
+        '    </scroll>' +
         '  </frame>' +
         '  <!-- 快捷操作栏 -->' +
         '  <horizontal id="quick_bar" bg="' + C.card + '" padding="8 8 12 8" gravity="center_vertical">' +

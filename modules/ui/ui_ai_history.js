@@ -104,9 +104,9 @@ UIAIHistory.prototype.renderHistoryList = function(conversations) {
             '<horizontal id="item_container" margin="0 0 0 12" gravity="center_vertical" bg="' + C.card + '" cornerRadius="16" padding="16">' +
             '  <vertical layout_weight="1" padding="0 4">' +
             '    <text id="conv_title" textSize="16sp" textColor="' + C.textPrimary + '" textStyle="bold" singleLine="true"/>' +
-            '    <horizontal gravity="center_vertical" marginTop="6">' +
-            '      <text text="' + I.calendar + ' ' + dateStr + '" textSize="12sp" textColor="' + C.textHint + '" marginRight="16"/>' +
-            '      <text text="' + I.comment + ' ' + userMsgCount + ' 轮对话" textSize="12sp" textColor="' + C.textHint + '"/>' +
+            '    <horizontal id="info_row" gravity="center_vertical" marginTop="6">' +
+            '      <text id="date_text" text="' + I.calendar + ' ' + dateStr + '" textSize="12sp" textColor="' + C.textHint + '" marginRight="16"/>' +
+            '      <text id="count_text" text="' + I.comment + ' ' + userMsgCount + ' 轮对话" textSize="12sp" textColor="' + C.textHint + '"/>' +
             '    </horizontal>' +
             '  </vertical>' +
             '  <text id="btn_delete" text="' + I.xmark + '" textSize="20sp" textColor="' + C.error + '" w="40" h="40" gravity="center"/>' +
@@ -119,11 +119,15 @@ UIAIHistory.prototype.renderHistoryList = function(conversations) {
         var itemContainer = item.item_container;
         var deleteBtn = item.btn_delete;
         var convTitle = item.conv_title;
+        var dateText = item.date_text;
+        var countText = item.count_text;
         // 动态设置标题，避免XML解析错误
         convTitle.setText(cleanedTitle);
 
-        // 只对删除按钮应用字体（因为它有X图标），标题是普通文字不需要
+        // 所有包含图标的文本都需要应用Font Awesome字体
         if (deleteBtn) mgr.fontManager.apply(deleteBtn);
+        if (dateText) mgr.fontManager.apply(dateText);
+        if (countText) mgr.fontManager.apply(countText);
 
         // 点击整个卡片加载对话
         if (itemContainer) {
